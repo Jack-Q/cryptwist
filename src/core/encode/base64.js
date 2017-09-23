@@ -6,6 +6,8 @@
  * separated using "=".
  */
 
+const encoderName = "Base64"
+
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
 const urlAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=';
@@ -69,6 +71,7 @@ const decode = (str = "") => {
 };
 
 const Base64Encoder = {
+  name: encoderName,
   encode,
   decode
 };
