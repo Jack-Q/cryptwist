@@ -19,9 +19,9 @@ The core module components provide functionality for specific tasks.
   - [ ] Base32 Hex Ext ([RFC4648 (Section-7)](https://tools.ietf.org/html/rfc4648#section-7))
 * [x] Base16 ([RFC4648 (Section-8)](https://tools.ietf.org/html/rfc4648#section-8))
 * [ ] Base36
-* [ ] Base85
+* [-] Base85
   - [ ] btoa version
-  - [ ] Ascii85 (Adobe)
+  - [x] Ascii85 (Adobe)
 
 ### Block Cipher Application Mode
  * [ ] ECB: Electronic Code Book
