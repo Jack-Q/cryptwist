@@ -24,8 +24,9 @@ module.exports = {
   },
   // add your custom rules here
   'rules': {
-    'no-mixed-operators': false,
-    'no-bitwise': false,
+    'no-mixed-operators': 0,
+    'no-bitwise': 0,
+    'no-throw-literal': 0,
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
       'js': 'never',
