@@ -16,6 +16,7 @@ const urlAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456
  * @argument array Uint8Array
  */
 const encode = (arr, len = arr.length, offset = 0) => {
+  len -= offset;
   if (!(arr instanceof Uint8Array)) {
     console.warn("array to be encoded ought to be Uint8Array")
   }
@@ -23,7 +24,7 @@ const encode = (arr, len = arr.length, offset = 0) => {
   const pad = (3 - len % 3) % 3;
   const end = len - 1;
 
-  return Array(len).fill(0)
+  return Array(sec).fill(0)
     .map((_, i) => [
                                                                       (arr[offset + i * 3 + 0] >> 2) & 077,
       ((arr[offset + i * 3 + 0] << 4) & 077) | (i * 3 + 1 > end ? 0 : (arr[offset + i * 3 + 1] >> 4) & 017),

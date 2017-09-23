@@ -31,6 +31,7 @@ const paddingCountSet = [0, 6, 4, 3, 1, 0];
  * @argument array Uint8Array
  */
 const encode = (arr, len = arr.length, offset = 0) => {
+  len -= offset;
   if (!(arr instanceof Uint8Array)) {
     console.warn("array to be encoded ought to be Uint8Array")
   }
@@ -38,7 +39,7 @@ const encode = (arr, len = arr.length, offset = 0) => {
   const pad = paddingCountSet[len % 5];
   const end = len - 1;
 
-  return Array(len).fill(0)
+  return Array(sec).fill(0)
     .map((_, i) => [
                                                                           (arr[offset + i * 5 + 0] >> 3) & 0b11111,
       ((arr[offset + i * 5 + 0] << 2) & 0b11100) | (i * 5 + 1 > end ? 0 : (arr[offset + i * 5 + 1] >> 6) & 0b00011),
@@ -101,3 +102,19 @@ const Base32Encoder = {
 };
 
 export default Base32Encoder;
+
+// const test = (msg) => {
+//   console.log("testing: " + msg)
+//   const enc = encode(msg)
+//   console.log("encoded: " + enc)
+//   const dec = decode(enc)
+//   console.log("decoded: " + dec)
+// }
+
+// test(Uint8Array.from([112]))
+// test(Uint8Array.from([112, 213]))
+// test(Uint8Array.from([112, 132, 122]))
+// test(Uint8Array.from([112, 142, 221, 229]))
+// test(Uint8Array.from([112, 207, 122, 119, 187]))
+// test(Uint8Array.from([112, 111, 222, 098, 090, 012]))
+// test(Uint8Array.from("HelloWorldJmnopqrstuvwxyz@".split('').map(s => s.charCodeAt(0))))
