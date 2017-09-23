@@ -14,7 +14,11 @@ const crc24Check = (arr, len = arr.length, offset = 0) => {
       if (crc & 0x01000000) { crc ^= CRC_24_POLY; }
     }
   }
-  return crc & 0xFFFFFF;
+  return Uint8Array.from([
+    (crc & 0xFF0000) >> 16,
+    (crc & 0x00FF00) >> 8,
+    (crc & 0x0000ff) >> 0,
+  ]);
 };
 
 /**
@@ -26,20 +30,26 @@ const encode = (arr, len = arr.length, offset = 0) => {
   }
 
   const content = Base64Encoder.encode(arr, len, offset);
-  const crc = crc24Check(arr, len, offset);
+  const crc = Base64Encoder.encode(crc24Check(arr, len, offset));
 
-  return content + crc;
+  return `${content}\n=${crc}`;
 };
 
 const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
-  if (str.length === 0 || str.length % 4 !== 0) {
-    throw 'decoder failure: invalid length of str';
+
+  const splitPivot = str.lastIndexOf('=');
+  const content = Base64Encoder.decode(str.substr(0, splitPivot).trim());
+  const crcChecksum = Base64Encoder.decode(str.substr(splitPivot + 1, 4));
+  const crc = crc24Check(content);
+
+  for (let i = 0; i < 3; i += 1) {
+    if (crc[i] !== crcChecksum[i]) { throw ''; }
   }
 
-  return Base64Encoder.decode(str);
+  return content;
 };
 
 const AsciiArmoredEncoder = {
