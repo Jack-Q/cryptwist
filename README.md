@@ -9,13 +9,15 @@ The core module components provide functionality for specific tasks.
 ### Encoding Methods
 * [-] Base64
   - [x] Basic Base64 ([RFC4648 (Section-4)](https://tools.ietf.org/html/rfc4648#section-4))
+    + [ ] Without Padding ([RFC7515 (Appendix-C)](https://tools.ietf.org/html/rfc7515#appendix-C))
   - [ ] URL Compatible Base64 ([RFC4648 (Section-5)](https://tools.ietf.org/html/rfc4648#section-5))
   - [ ] GPG Ascii Armoring Variant ([RFC4880 (Section-6)](https://tools.ietf.org/html/rfc4880#section-6))
-  - [ ] Without Padding ([RFC7515 (Appendix-C)](https://tools.ietf.org/html/rfc7515#appendix-C))
-* [ ] Base32
-  - [ ] Basic Base32 ([RFC4648 (Section-6)](https://tools.ietf.org/html/rfc4648#section-6))
+* [-] Base32
+  - [-] Basic Base32 ([RFC4648 (Section-6)](https://tools.ietf.org/html/rfc4648#section-6))
+    + [ ] Decoder Character Replacement (0 -> O, 1 -> I)
+    + [ ] Decoder Character Case (lower to upper) & Replacement (1 -> l, I -> l)
   - [ ] Base32 Hex Ext ([RFC4648 (Section-7)](https://tools.ietf.org/html/rfc4648#section-7))
-* [ ] Base16 ([RFC4648 (Section-8)](https://tools.ietf.org/html/rfc4648#section-8))
+* [x] Base16 ([RFC4648 (Section-8)](https://tools.ietf.org/html/rfc4648#section-8))
 * [ ] Base36
 * [ ] Base85
   - [ ] btoa version
@@ -25,6 +27,7 @@ The core module components provide functionality for specific tasks.
  * [ ] ECB: Electronic Code Book
  * [ ] CBC: Cipher Block Chain
  * [ ] CFB: Cipher Feedback
+   - [ ] OpenPGP CFB: ([RFC 4880 (Section-13.9)](https://tools.ietf.org/html/rfc4880#section-13.9))
  * [ ] OFB: Output Feedback
  * [ ] CTR: Counter
 
@@ -46,12 +49,24 @@ The core module components provide functionality for specific tasks.
  * [ ] Cipher-based
  * [ ] ANSI-X9.17
 
-### Block Ciphers
+### Symmetric-Key Algorithms
  * [ ] DES
  * [ ] 3DES
  * [ ] IDEA
  * [ ] RC5
  * [ ] AES (Rijndeal)
+ * [ ] Twofish
+ * [ ] Blowfish
+ * [ ] CAST5
+
+### Public-Key Algorithms
+ * [ ] RSA
+ * [ ] DSA
+ * [ ] Elliptic Curve
+ * [ ] Diffie-Hellman
+ * [ ] ECDSA
+
+### Compression Algorithms
 
 ## Build Setup
 
