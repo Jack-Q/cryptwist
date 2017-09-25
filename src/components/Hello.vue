@@ -11,9 +11,9 @@
         <button @click="this.updateEncoder">Update</button>
       </div>
       <hr>
-      <code>{{result}}</code>
+      <pre><code>{{result}}</code></pre>
       <hr>
-      <code>{{decodeResult}}</code>
+      <pre><code>{{decodeResult}}</code></pre>
     </div>
 
   </div>
@@ -27,7 +27,7 @@ export default {
   data() {
     return {
       msg: 'Welcome to Your Vue.js App',
-      cipher: 'Base64',
+      cipher: 'Ascii Armored',
       plainText: 'Hello World',
       result: 'Apply Cipher First',
       decodeResult: 'Apply Cipher First',
@@ -45,6 +45,10 @@ export default {
       this.result = encoder.encode(Uint8Array.from(text.split('').map(s => s.charCodeAt(0))));
       this.decodeResult = Array.from(encoder.decode(this.result)).map(i => String.fromCharCode(i)).join('');
     },
+  },
+
+  render() {
+    console.log('update');
   },
 };
 </script>
@@ -68,4 +72,14 @@ li {
 a {
   color: #42b983;
 }
+pre {
+  margin: 0 20%;
+  text-align: left;
+
+ 
+ border: solid 1px #ccc;
+
+
+}
+
 </style>
