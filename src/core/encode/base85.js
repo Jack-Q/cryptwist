@@ -13,7 +13,6 @@ const encode = (arr, len = arr.length, offset = 0) => {
   }
   const sec = Math.ceil(len / 4);
   const pad = (4 - len % 4) % 4;
-  console.log(pad);
 
   const str = Array(sec).fill(0).map((_, i) => {
     const sum =
@@ -22,9 +21,9 @@ const encode = (arr, len = arr.length, offset = 0) => {
         + ((0xff & arr[offset + i * 4 + 2]) << 8)
         + ((0xff & arr[offset + i * 4 + 3]));
 
-      // for all zero section, packing it with a shorthand as 'z' which will be
-      // encoded as !!!!! by base conversion
-    if (sum === 0x00000000) { return 'z'; }
+    // for all zero section, packing it with a shorthand as 'z' which will be
+    // encoded as !!!!! by base conversion
+    if (sum === 0x00000000 && (pad === 0 || i * 4 + 3 < len)) { return 'z'; }
     let quotient = sum;
     return Array(5).fill(0).map(() => {
       const val = quotient % 85;
@@ -51,6 +50,11 @@ const decode = (str = '') => {
   // expand `z' abbreviation
   const cnt = str.substr(2, str.length - 4).replace(/z/g, alphabet[0].repeat(5));
   const pad = (5 - cnt.length % 5) % 5;
+
+  // padding character should be 0 to 3, no valid scenario will generate 4 padding characters
+  if (pad === 4) {
+    throw 'decoder failure: invalid length of str';
+  }
 
   const data = (cnt + alphabet[84].repeat(pad)).match(/...../g).map((sec, s) => {
     const sum = Array(5).fill(0).map((_, i) => {
@@ -82,27 +86,3 @@ const Base85Encoder = {
 
 export default Base85Encoder;
 
-// const test = (data) => {
-//   console.log("testing: " + data)
-//   const enc = (typeof data === 'string') ?
-//     encode(Uint8Array.from(data.split('').map(s => s.charCodeAt(0)))) :
-//     encode(Uint8Array.from(data));
-//   console.log("encoded: " + enc)
-//   const dec = decode(enc)
-//   if (typeof data === 'string') {
-//     console.log("decoded: " + Array.from(dec).map(i => String.fromCharCode(i)).join(''))
-//   } else {
-//     console.log("decoded: " + dec)
-//   }
-// }
-
-// test("Hello World\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0")
-// test(Uint8Array.from([112, 213]))
-// test(Uint8Array.from([112, 132, 122]))
-// test(Uint8Array.from([112, 142, 221, 229]))
-// test(Uint8Array.from([112, 207, 122, 119, 187]))
-// test(Uint8Array.from([112, 111, 222, 098, 090, 012]))
-// test('Man is distinguished, not only by his reason, but by this singular'
-//   + ' passion from other animals, which is a lust of the mind, that by a'
-//   + ' perseverance of delight in the continued and indefatigable '
-//   + 'generation of knowledge, exceeds the short vehemence of any carnal pleasure.');

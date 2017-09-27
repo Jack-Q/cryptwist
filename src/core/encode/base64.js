@@ -49,6 +49,9 @@ const decode = (str = '') => {
     if (padStr !== alphabet[64].repeat(pad)) {
       throw `decoder failure: invalid character found at the end which is ${padStr}${pad}`;
     }
+    if (pad >= 3) {
+      throw 'invalid length of padding string';
+    }
   }
 
   const len = str.length / 4 * 3 - pad;
