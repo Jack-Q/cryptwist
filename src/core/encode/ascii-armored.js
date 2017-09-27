@@ -46,7 +46,7 @@ const decode = (str = '') => {
   const crc = crc24Check(content);
 
   for (let i = 0; i < 3; i += 1) {
-    if (crc[i] !== crcChecksum[i]) { throw ''; }
+    if (crc[i] !== crcChecksum[i]) { throw 'invalid checksum'; }
   }
 
   return content;

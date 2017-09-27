@@ -4,6 +4,8 @@ beforeEach(() => {
   });
 });
 
+const rnd = n => Array(n).fill(0).map(() => Math.floor(255 * Math.random()));
+
 const testEncoderObject = (encoder) => {
   it('should has name property', () => expect(typeof encoder.name).toBe('string'));
   it('should contain encode method', () => expect(typeof encoder.encode).toBe('function'));
@@ -13,7 +15,14 @@ const testEncoderObject = (encoder) => {
 const testEncoderFunction = (encoder, src, exp) => {
   const plain = typeof src === 'string' ?
     Uint8Array.from(src.split('').map(s => s.charCodeAt(0))) : Uint8Array.from(src);
+  const offset = rnd(1)[0];
   it(`should encode ${src} as ${exp}`, () => expect(encoder.encode(plain)).toBe(exp));
+  it(`should encode ${src} (with offset) as ${exp}`, () =>
+    expect(encoder.encode(Uint8Array.from([
+      ...rnd(offset),
+      ...plain,
+      ...rnd(...rnd(1)),
+    ]), plain.length, offset)).toBe(exp));
   it(`should decode ${exp} as ${src}`, () => expect(encoder.decode(exp)).toEqual(plain));
 };
 

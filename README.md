@@ -1,4 +1,4 @@
-# crypto-vis
+# Cryptwist
 
 > Cryptographic Algorithm Visualization
 

@@ -69,8 +69,11 @@ const decode = (str = '') => {
       throw 'decoder failure: too much padding character';
     }
     if (padStr !== alphabet[32].repeat(pad)) {
-      throw `decoder failure: invalid character found at the end which is ${padStr}${pad}`;
+      throw `decoder failure: unexpected character found at the end which is ${padStr}${pad}`;
     }
+  }
+  if (paddingCountSet.lastIndexOf(pad) === -1) {
+    throw 'decoder failure: invalid padding';
   }
 
   const len = str.length / 8 * 5 - 5 + paddingCountSet.lastIndexOf(pad);
