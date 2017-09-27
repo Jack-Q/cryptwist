@@ -16,7 +16,7 @@ The core module components provide functionality for specific tasks.
   - [-] Basic Base32 ([RFC4648 (Section-6)](https://tools.ietf.org/html/rfc4648#section-6))
     + [ ] Decoder Character Replacement (0 -> O, 1 -> I)
     + [ ] Decoder Character Case (lower to upper) & Replacement (1 -> l, I -> l)
-  - [ ] Base32 Hex Ext ([RFC4648 (Section-7)](https://tools.ietf.org/html/rfc4648#section-7))
+  - [x] Base32 Hex Ext ([RFC4648 (Section-7)](https://tools.ietf.org/html/rfc4648#section-7))
 * [x] Base16 ([RFC4648 (Section-8)](https://tools.ietf.org/html/rfc4648#section-8))
 * [ ] Base36
 * [-] Base85

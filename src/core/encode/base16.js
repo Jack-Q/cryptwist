@@ -19,7 +19,10 @@ const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
-  if (str.length === 0 || str.length % 2 !== 0) {
+  if (str.length === 0) {
+    return Uint8Array.from([]);
+  }
+  if (str.length % 2 !== 0) {
     throw 'decoder failure: invalid length of str';
   }
   return Uint8Array.from(str.match(/../g).map(sec => alphabet.indexOf(sec[0]) << 4 | alphabet.indexOf(sec[1])));

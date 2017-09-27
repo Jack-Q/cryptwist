@@ -2,8 +2,6 @@ const encoderName = 'Base32';
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=';
 
-// const hexAlphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUV=';
-
 // for string with character count other then a multiple of 5
 // the remainder of which by 5 is used as index of the array
 const paddingCountSet = [0, 6, 4, 3, 1, 0];
@@ -57,7 +55,10 @@ const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
-  if (str.length === 0 || str.length % 8 !== 0) {
+  if (str.length === 0) {
+    return Uint8Array.from([]);
+  }
+  if (str.length % 8 !== 0) {
     throw 'decoder failure: invalid length of str';
   }
 
@@ -102,6 +103,7 @@ const Base32Encoder = {
   name: encoderName,
   encode,
   decode,
+  alphabet,
 };
 
 export default Base32Encoder;
