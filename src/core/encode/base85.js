@@ -15,11 +15,12 @@ const encode = (arr, len = arr.length, offset = 0) => {
   const pad = (4 - len % 4) % 4;
 
   const str = Array(sec).fill(0).map((_, i) => {
+    const padPos = i * 4 + 3 < len ? 0 : pad;
     const sum =
         (((0xff & arr[offset + i * 4 + 0]) << 23) * 2)
-        + ((0xff & arr[offset + i * 4 + 1]) << 16)
-        + ((0xff & arr[offset + i * 4 + 2]) << 8)
-        + ((0xff & arr[offset + i * 4 + 3]));
+        + ((0xff & (padPos >= 3 ? 0 : arr[offset + i * 4 + 1])) << 16)
+        + ((0xff & (padPos >= 2 ? 0 : arr[offset + i * 4 + 2])) << 8)
+        + ((0xff & (padPos >= 1 ? 0 : arr[offset + i * 4 + 3])));
 
     // for all zero section, packing it with a shorthand as 'z' which will be
     // encoded as !!!!! by base conversion
