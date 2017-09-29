@@ -48,7 +48,7 @@ const STATE_SIZE = 256;
  * @param {Uint8Array} key Key for RC4
  * @returns {Uint8Array}
  */
-const ksa = (key) => {
+export const ksa = (key) => {
   if (key.length < MIN_KEY_LEN || key.length > MAX_KEY_LEN) {
     throw `inappropriate length of key for ${CIPHER_NAME}, expecting unsigned byte array (Uint8Array) with ${MIN_KEY_LEN} to ${MAX_KEY_LEN} elements`;
   }
@@ -71,7 +71,7 @@ const ksa = (key) => {
  *
  * @param {Uint8Array} stateArray
  */
-function* prga(stateArray) {
+export function* prga(stateArray) {
   let i = 0;
   let j = 0;
   //eslint-disable-next-line
@@ -85,14 +85,14 @@ function* prga(stateArray) {
   }
 }
 
-class RC4StreamCipher extends StreamCipher {
+export class RC4StreamCipher extends StreamCipher {
   get stream() {
     return prga(ksa(this.key));
   }
 
   encrypt(data) {
     const stream = this.stream;
-    return data.map(v => v ^ stream.next());
+    return data.map(v => v ^ stream.next().value);
   }
 
   decrypt(cipher) {
@@ -101,3 +101,4 @@ class RC4StreamCipher extends StreamCipher {
 }
 
 export default RC4StreamCipher;
+
