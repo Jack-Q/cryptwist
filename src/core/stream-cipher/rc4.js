@@ -21,13 +21,13 @@
 
 import { StreamCipher } from '../base/api';
 
- /**
-  * Helper function to swap element in an array
-  *
-  * @param {Uint8Array} array
-  * @param {Number} p
-  * @param {Number} q
-  */
+/**
+ * Helper function to swap element in an array
+ *
+ * @param {Uint8Array} array
+ * @param {Number} p
+ * @param {Number} q
+ */
 const swap = (array, p, q) => {
   array[q] ^= array[p]; // eslint-disable-line
   array[p] ^= array[q]; // eslint-disable-line
@@ -49,11 +49,11 @@ const STATE_SIZE = 256;
  * @returns {Uint8Array}
  */
 export const ksa = (key) => {
-  if (key.length < MIN_KEY_LEN || key.length > MAX_KEY_LEN) {
+  const keyLength = key.length;
+
+  if (keyLength < MIN_KEY_LEN || keyLength > MAX_KEY_LEN) {
     throw `inappropriate length of key for ${CIPHER_NAME}, expecting unsigned byte array (Uint8Array) with ${MIN_KEY_LEN} to ${MAX_KEY_LEN} elements`;
   }
-
-  const keyLength = key.length;
 
   // initialize state array to [0..255]
   const stateArray = new Uint8Array(STATE_SIZE).fill(0).map((v, i) => i);
@@ -101,4 +101,3 @@ export class RC4StreamCipher extends StreamCipher {
 }
 
 export default RC4StreamCipher;
-

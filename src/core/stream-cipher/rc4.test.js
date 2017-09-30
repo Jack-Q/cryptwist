@@ -12,3 +12,9 @@ it('should be the same stream for the same key', () => expect(createStream()).to
 
 it('should encrypt message as expectation', () =>
   expect(Base64.encode(cipher.encrypt(Base64.decode('HelloWorld++')))).toEqual('ipezNljMxlvm'));
+
+it('should validate the length of key longer then minimal', () => expect(() =>
+  new RC4StreamCipher(Uint8Array.from([])).stream).toThrow(/length/));
+it('should validate the length of key shorter then the maximal', () => expect(() =>
+  new RC4StreamCipher(Uint8Array.from(Array(260).fill(0))).stream).toThrow(/length/));
+
