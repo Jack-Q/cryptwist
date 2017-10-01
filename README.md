@@ -50,8 +50,8 @@ The core module components provide functionality for specific tasks.
  * [ ] ANSI-X9.17
 
 ### Symmetric-Key Algorithms
- * [ ] DES
- * [ ] 3DES
+ * [x] DES
+ * [x] 3DES
  * [ ] IDEA
  * [ ] RC5
  * [ ] AES (Rijndeal)
