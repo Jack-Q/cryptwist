@@ -46,6 +46,14 @@ export const checkKey = (key) => {
   return { checked: true, original: key, core: keyCore };
 };
 
+const feistelStructure = (f, subKey, data, round = subKey.length) => {
+  let result = data;
+  for (let i = 0; i < round; i += 1) {
+    result = [result[1], f(result[0], subKey[1])];
+  }
+  return result;
+};
+
 export class DESBlockCipher extends BlockCipher {
 
   constructor(key) {
@@ -65,7 +73,10 @@ export class DESBlockCipher extends BlockCipher {
       throw 'DES requires the length of data block for encryption is 64 bits (8 bytes)';
     }
     const permutedData = initialPermute([data.slice(0, 4), data.slice(4)]);
-    const result = finalPermute(permutedData);
+
+    const encrpytedData = feistelStructure(desFunc, this.subKey, permutedData);
+
+    const result = finalPermute(encryptedData);
     return Int8Array.of(...result[0], ...result[1]);
   }
 
