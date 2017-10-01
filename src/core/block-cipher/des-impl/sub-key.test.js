@@ -1,6 +1,6 @@
 import { generateSubKey, permuteKey } from './sub-key';
 
-import { checkKey } from '../des';
+import { checkKey } from './check-key';
 
 const subKey = generateSubKey(Uint8Array.from([220, 120, 98, 12, 43, 201, 98]));
 it('should generate sub-key', () => expect(subKey).toBeTruthy());
