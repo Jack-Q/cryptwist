@@ -1,4 +1,8 @@
-import { StreamCipher, TODO } from './api';
+import {
+  TODO,
+  BlockCipher,
+  StreamCipher,
+} from './api';
 
 it('should throw default TODO message', () => expect(() => TODO(null)).toThrow(/TODO/));
 
@@ -20,3 +24,4 @@ const checkSubclassImplementation = (ClassName, requiredMembers) => {
 
 
 checkSubclassImplementation(StreamCipher, ['stream', 'encrypt', 'decrypt']);
+checkSubclassImplementation(BlockCipher, ['encrypt', 'decrypt']);

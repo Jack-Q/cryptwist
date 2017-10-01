@@ -37,7 +37,7 @@ const permuteKey = (key) => {
     const ind = tableInd - Math.floor(tableInd / 8) - 1;
     const b = (key[Math.floor(ind / 8)] >> (8 - ind % 8)) & 0b1;
     if (b === 0b1) {
-      pk[Math.floor(i / 8)] |= 0b1 << (i % 8);
+      pk[Math.floor(i / 8)] |= 0b1 << (7 - i % 8);
     }
   }
   return pk;
@@ -50,7 +50,7 @@ const compressPermuteKey = (left, right) => {
     const bitVal = (tableInd < 28 ? left >>> (27 - tableInd) : right >>> (55 - tableInd)) & 0b1;
     if (bitVal === 0b1) {
       // set bit
-      sk[Math.floor(i / 8)] |= 0b1 << (i % 8);
+      sk[Math.floor(i / 8)] |= 0b1 << (7 - i % 8);
     }
   }
   return sk;
