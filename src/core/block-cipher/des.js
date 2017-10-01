@@ -11,8 +11,10 @@
 
 import { BlockCipher } from '../base/api';
 
-import generateSubKey from './des-impl/sub-key';
+import { generateSubKey } from './des-impl/sub-key';
 import { initialPermute, finalPermute } from './des-impl/perm';
+import { desFunc } from './des-impl/des-func';
+import { feistelStructure } from './des-impl/festial';
 
 const checkParity = (b8) => {
   const b4 = b8 ^ (b8 >>> 4);
@@ -46,12 +48,14 @@ export const checkKey = (key) => {
   return { checked: true, original: key, core: keyCore };
 };
 
-const feistelStructure = (f, subKey, data, round = subKey.length) => {
-  let result = data;
-  for (let i = 0; i < round; i += 1) {
-    result = [result[1], f(result[0], subKey[1])];
-  }
-  return result;
+
+const desCore = (data, subKey) => {
+  const permutedData = initialPermute([data.slice(0, 4), data.slice(4)]);
+
+  const encryptedData = feistelStructure(desFunc, subKey, permutedData);
+
+  const result = finalPermute(encryptedData);
+  return Uint8Array.of(...result[0], ...result[1]);
 };
 
 export class DESBlockCipher extends BlockCipher {
@@ -72,16 +76,14 @@ export class DESBlockCipher extends BlockCipher {
     if (data.length !== 8) {
       throw 'DES requires the length of data block for encryption is 64 bits (8 bytes)';
     }
-    const permutedData = initialPermute([data.slice(0, 4), data.slice(4)]);
-
-    const encrpytedData = feistelStructure(desFunc, this.subKey, permutedData);
-
-    const result = finalPermute(encryptedData);
-    return Int8Array.of(...result[0], ...result[1]);
+    return desCore(data, this.subKey);
   }
 
   decrypt(cipher) {
-
+    if (cipher.length !== 8) {
+      throw 'DES requires the length of cipher for encryption is 64 bits (8 bytes)';
+    }
+    return desCore(cipher, this.subKey.reverse());
   }
 }
 
