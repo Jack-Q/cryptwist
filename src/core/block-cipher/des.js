@@ -12,6 +12,7 @@
 import { BlockCipher } from '../base/api';
 
 import generateSubKey from './des-impl/sub-key';
+import { initialPermute, finalPermute } from './des-impl/perm';
 
 const checkParity = (b8) => {
   const b4 = b8 ^ (b8 >>> 4);
@@ -39,8 +40,8 @@ export const checkKey = (key) => {
     throw 'Parity check failed for DES key';
   }
 
-  const keyCore = Uint8Array(7).fill(0)
-    .map((_, i) => (key[i] << (i + 1)) & (key[i + 1] >>> (7 - i)));
+  const keyCore = new Uint8Array(7).fill(0)
+    .map((_, i) => ((key[i] & 0xfe) << i) | (key[i + 1] >>> (7 - i)));
 
   return { checked: true, original: key, core: keyCore };
 };
@@ -63,6 +64,9 @@ export class DESBlockCipher extends BlockCipher {
     if (data.length !== 8) {
       throw 'DES requires the length of data block for encryption is 64 bits (8 bytes)';
     }
+    const permutedData = initialPermute([data.slice(0, 4), data.slice(4)]);
+    const result = finalPermute(permutedData);
+    return Int8Array.of(...result[0], ...result[1]);
   }
 
   decrypt(cipher) {

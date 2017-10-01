@@ -27,7 +27,7 @@ const permutedChoice2 = Uint8Array.from([
   46, 42, 50, 36, 29, 32,
 ]);
 
-const permuteKey = (key) => {
+export const permuteKey = (key) => {
   const pk = new Uint8Array(7).fill(0);
   for (let i = 0; i < 56; i += 1) {
     const tableInd = permutedChoice1[i];
@@ -35,7 +35,7 @@ const permuteKey = (key) => {
     // index in permuted choice 1 is indexed from 1
     // index contains parity bits
     const ind = tableInd - Math.floor(tableInd / 8) - 1;
-    const b = (key[Math.floor(ind / 8)] >> (8 - ind % 8)) & 0b1;
+    const b = (key[Math.floor(ind / 8)] >> (7 - ind % 8)) & 0b1;
     if (b === 0b1) {
       pk[Math.floor(i / 8)] |= 0b1 << (7 - i % 8);
     }
@@ -43,7 +43,7 @@ const permuteKey = (key) => {
   return pk;
 };
 
-const compressPermuteKey = (left, right) => {
+export const compressPermuteKey = (left, right) => {
   const sk = new Uint8Array(6).fill(0);
   for (let i = 0; i < 48; i += 1) {
     const tableInd = permutedChoice2[i] - 1;
@@ -62,7 +62,7 @@ const compressPermuteKey = (left, right) => {
  * @param {Uint8Array} key
  * @returns {Array<Uint8Array>}
  */
-const generateSubKey = (key) => {
+export const generateSubKey = (key) => {
   const pk = permuteKey(key);
   const leftKey = ((pk[0] << 20) | (pk[1] << 12) | (pk[2] << 4) | (pk[3] >>> 4)) & 0x0fffffff;
   const rightKey = ((pk[3] << 24) | (pk[4] << 16) | (pk[5] << 8) | pk[6]) & 0x0fffffff;
