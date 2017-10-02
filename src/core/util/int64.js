@@ -27,7 +27,6 @@ export class Int64 {
   }
 
   get loBytesLE() {
-    console.log(this.val);
     return Uint8Array.of(
       this.data[2],
       this.data[2] >>> 8,

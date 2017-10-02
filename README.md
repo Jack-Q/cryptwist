@@ -33,7 +33,7 @@ The core module components provide functionality for specific tasks.
 
 ### Hash Functions
  * [ ] MD4
- * [ ] MD5
+ * [x] MD5
  * [ ] SHA-1
  * [ ] SHA-2
    - [ ] SHA-256
