@@ -3,10 +3,12 @@ export const TODO = (that, message = '[TODO] this function should be override in
 };
 
 export class Hash {
-  constructor() { this.reset(); }
+  constructor() { this.init(); this.reset(); }
 
   feedData(data) { return TODO([this, data]); }
   endData(data) { return TODO([this, data]); }
+
+  init() { this.reset(); }
   reset() { return TODO([this]); }
 
   hash(data) { return TODO([this, data]); }
