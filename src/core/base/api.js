@@ -2,6 +2,14 @@ export const TODO = (that, message = '[TODO] this function should be override in
   throw message;
 };
 
+export class Hash {
+  feedData(data) { return TODO([this, data]); }
+  endData(data) { return TODO([this, data]); }
+  reset() { return TODO([this]); }
+
+  hash(data) { return TODO([this, data]); }
+}
+
 export class BlockCipher {
   key;
   encrypt(data) { return TODO([this, data]); }
