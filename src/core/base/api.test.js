@@ -14,8 +14,9 @@ it('should throw default TODO message', () => expect(() => TODO(null)).toThrow(/
  * @param {String[]} requiredMembers
  */
 const checkSubclassImplementation = (ClassName, requiredMembers) => {
-  class EmptyImpl extends ClassName { }
-  const inst = new EmptyImpl();
+  const inst = {};
+  // use prototype assignment to avoid invocation of constructor
+  Object.setPrototypeOf(inst, ClassName.prototype);
   requiredMembers.map(m =>
     it(`should check implementation of ${m} in subclass`, () =>
       expect(() => (typeof inst[m] === 'function' ? inst[m]() : inst[m]))
