@@ -2,12 +2,14 @@ import {
   Hash,
 } from '../base/api';
 
+import { Int64 } from '../util/int64';
+
 const initState = Uint32Array.of(0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476);
 // const initState = Uint32Array.of(0x01234567, 0x89abcdef, 0xfedcba98, 0x76543210);
 
 // Generate constant table can use the following statement
 // const k = Array(64).fill(0).map((_, i) =>
-//   Math.floor(Math.abs(Math.sin(i + 1)) * (2 ** 32)) & 0xffffffff);
+//   Math.floor(Math.abs(Math.sin(i + 1)) * (2 ** 32)));
 // and the result will be shown as follows:
 const k = Uint32Array.of(
   0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
@@ -81,55 +83,6 @@ const md5MainLoop = (state, buffer) => {
   state[3] += d;
 };
 
-
-/**
- * Use 3 32-bit number to simulate 64-bit number
- * @param {Array<Number>} len length array to update
- * @param {Number|Array<Number>} cur
- */
-const addNumberToLength = (len, cur) => {
-  const arr = cur instanceof Array ? cur : [0, cur >>> 24, cur & 0xffffff];
-  let carry = 0;
-
-  len[2] += arr[2];
-  carry = len[2] >>> 24;
-  len[2] &= 0xffffff;
-
-  len[1] += arr[1] + carry;
-  carry = len[1] >>> 24;
-  len[1] &= 0xffffff;
-
-  len[0] += arr[0] + carry;
-  len[0] &= 0xffff;
-};
-
-const getLoBytesLE = len => Uint8Array.of(
-  len[2],
-  len[2] >>> 8,
-  len[2] >>> 16,
-  len[1],
-);
-const getHiBytesLE = len => Uint8Array.of(
-  len[1] >>> 8,
-  len[1] >>> 16,
-  len[0],
-  len[0] >>> 8,
-);
-
-const getHiBytesBE = len => Uint8Array.of(
-  len[0] >>> 8,
-  len[0],
-  len[1] >>> 16,
-  len[1] >>> 8,
-);
-
-const getLoBytesBE = len => Uint8Array.of(
-  len[1],
-  len[2] >>> 16,
-  len[2] >>> 8,
-  len[2],
-);
-
 export class MD5Hash extends Hash {
 
   hash(data) {
@@ -143,7 +96,7 @@ export class MD5Hash extends Hash {
   init() {
     this.state = new Uint32Array(4);
     this.clean = true;
-    this.length = [0, 0, 0];
+    this.length = new Int64();
     this.buffer = new Uint8Array(64);
     this.bufferLength = 0;
   }
@@ -151,7 +104,7 @@ export class MD5Hash extends Hash {
   reset() {
     initState.forEach((v, i) => { this.state[i] = v; });
     this.clean = true;
-    this.length.fill(0);
+    this.length.val = 0;
     this.buffer.fill(0);
     this.bufferLength = 0;
   }
@@ -167,8 +120,8 @@ export class MD5Hash extends Hash {
       this.mainLoop();
       this.buffer.fill(0);
     }
-    this.buffer.set(getLoBytesLE(this.length), 56);
-    this.buffer.set(getHiBytesLE(this.length), 60);
+    this.buffer.set(this.length.loBytesLE, 56);
+    this.buffer.set(this.length.hiBytesLE, 60);
     this.mainLoop();
 
     const result = new Uint8Array(Uint32Array.of(...this.state).buffer);
@@ -198,7 +151,7 @@ export class MD5Hash extends Hash {
       }
     }
 
-    addNumberToLength(this.length, data.length * 8);
+    this.length.addNumberToLength(data.length * 8);
   }
 
 

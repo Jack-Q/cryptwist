@@ -1,4 +1,4 @@
-import { MD5Hash, add32 } from './md5';
+import { MD5Hash } from './md5';
 import Encode from '../encode';
 
 const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () =>
