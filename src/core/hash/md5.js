@@ -126,6 +126,18 @@ const getBytesLE = len => Uint8Array.of(
   len[1],
 );
 
+const getBytesBE = len => Uint8Array.of(
+  len[0] >>> 8,
+  len[0],
+  len[1] >>> 16,
+  len[1] >>> 8,
+
+  len[1],
+  len[2] >>> 16,
+  len[2] >>> 8,
+  len[2],
+);
+
 export class MD5Hash extends Hash {
 
   hash(data) {
@@ -165,7 +177,7 @@ export class MD5Hash extends Hash {
     }
     this.buffer.set(getBytesLE(this.length), 56);
     this.mainLoop();
-
+    console.log(this.buffer);
     const result = new Uint8Array(Uint32Array.of(...this.state).buffer);
     this.reset();
     return result;

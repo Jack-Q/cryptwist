@@ -6,6 +6,7 @@ const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () =>
 
 const testCases = [
   ['', 'd41d8cd98f00b204e9800998ecf8427e'],
+  // ['\0', '8f7cbbbe0e8f898a6fa93056b3de9c9c'],
   // ['Hello World', 'b10a8db164e0754105b7a99be72e3fe5'],
   // ['The quick brown fox jumps over the lazy dog', '9e107d9d372bb6826bd81d3542a419d6'],
   // ['The quick brown fox jumps over the lazy dog.', 'e4d909c290d0fb1ca068ffaddf22cbd0'],
