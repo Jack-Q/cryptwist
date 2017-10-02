@@ -35,11 +35,6 @@ const shiftAmount = [
   6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
 ];
 
-export const add32 = (a, b) => {
-  const lo = (a & 0xffff) + (b & 0xffff);
-  const hi = (lo >>> 16) + (a >>> 16) + (b >>> 16);
-  return (hi << 16) | (lo & 0xffff);
-};
 
 /**
  *
@@ -66,30 +61,24 @@ const md5MainLoop = (state, buffer) => {
       f = c ^ (b | ~d);
       g = (7 * i) % 16;
     }
-    // const mg =
-    //   (buffer[g * 4 + 3] << 24) |
-    //   (buffer[g * 4 + 2] << 16) |
-    //   (buffer[g * 4 + 1] << 8) |
-    //   (buffer[g * 4 + 0] << 0);
-
     const mg =
       (buffer[g * 4 + 3] << 24) |
       (buffer[g * 4 + 2] << 16) |
       (buffer[g * 4 + 1] << 8) |
       (buffer[g * 4 + 0] << 0);
 
-    // f = (((((f + a) & 0xffffffff) + mg) & 0xffffffff) + k[i]) & 0xffffffff;
-    f = add32(add32(add32(f, a), mg), k[i]);
+    f = f + a + mg + k[i];
     a = d;
     d = c;
     c = b;
-    b = add32(b, (f << shiftAmount[i]) | (f >>> (32 - shiftAmount[i])));
+
+    b += (f << shiftAmount[i]) | (f >>> (32 - shiftAmount[i]));
   }
 
-  state[0] = add32(a, state[0]);
-  state[1] = add32(b, state[1]);
-  state[2] = add32(c, state[2]);
-  state[3] = add32(d, state[3]);
+  state[0] += a;
+  state[1] += b;
+  state[2] += c;
+  state[3] += d;
 };
 
 
@@ -114,24 +103,27 @@ const addNumberToLength = (len, cur) => {
   len[0] &= 0xffff;
 };
 
-const getBytesLE = len => Uint8Array.of(
-  len[1] >>> 8,
-  len[1] >>> 16,
-  len[0],
-  len[0] >>> 8,
-
+const getLoBytesLE = len => Uint8Array.of(
   len[2],
   len[2] >>> 8,
   len[2] >>> 16,
   len[1],
 );
+const getHiBytesLE = len => Uint8Array.of(
+  len[1] >>> 8,
+  len[1] >>> 16,
+  len[0],
+  len[0] >>> 8,
+);
 
-const getBytesBE = len => Uint8Array.of(
+const getHiBytesBE = len => Uint8Array.of(
   len[0] >>> 8,
   len[0],
   len[1] >>> 16,
   len[1] >>> 8,
+);
 
+const getLoBytesBE = len => Uint8Array.of(
   len[1],
   len[2] >>> 16,
   len[2] >>> 8,
@@ -168,16 +160,17 @@ export class MD5Hash extends Hash {
     this.feedData(data);
 
     // finalize padding
-    this.buffer[this.bufferLength] = 0b10000000;
+    this.buffer[this.bufferLength] = 0b10000000; // add a single '1' bit
     this.buffer.fill(0, this.bufferLength + 1);
     if (this.bufferLength >= 56) {
       // no sufficient space for writing padding length
       this.mainLoop();
       this.buffer.fill(0);
     }
-    this.buffer.set(getBytesLE(this.length), 56);
+    this.buffer.set(getLoBytesLE(this.length), 56);
+    this.buffer.set(getHiBytesLE(this.length), 60);
     this.mainLoop();
-    console.log(this.buffer);
+
     const result = new Uint8Array(Uint32Array.of(...this.state).buffer);
     this.reset();
     return result;
