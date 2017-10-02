@@ -42,7 +42,7 @@ The core module components provide functionality for specific tasks.
  * [ ] SHA-3 (Keccak)
 
 ### Pseudo-Random Number Generators / Stream Ciphers
- * [ ] RC4
+ * [x] RC4
  * [ ] RC4-MD5
  * [ ] Linear congruential generator 
  * [ ] Hash-based
@@ -50,8 +50,8 @@ The core module components provide functionality for specific tasks.
  * [ ] ANSI-X9.17
 
 ### Symmetric-Key Algorithms
- * [x] DES
- * [x] 3DES
+ * [x] DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
+ * [x] 3DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
  * [ ] IDEA
  * [ ] RC5
  * [ ] AES (Rijndeal)
