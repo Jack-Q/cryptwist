@@ -1,11 +1,6 @@
-import {
-  Hash,
-} from '../base/api';
-
-import { Int64 } from '../util/int64';
+import { MD4HashBase } from './md4-family/base';
 
 const initState = Uint32Array.of(0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476);
-// const initState = Uint32Array.of(0x01234567, 0x89abcdef, 0xfedcba98, 0x76543210);
 
 // Generate constant table can use the following statement
 // const k = Array(64).fill(0).map((_, i) =>
@@ -83,77 +78,27 @@ const md5MainLoop = (state, buffer) => {
   state[3] += d;
 };
 
-export class MD5Hash extends Hash {
+export class MD5Hash extends MD4HashBase {
 
-  hash(data) {
-    if (this.clean) {
-      return this.endData(data);
-    }
-    // use static method to construct new hash
-    return MD5Hash.hash(data);
-  }
-
-  init() {
-    this.state = new Uint32Array(4);
-    this.clean = true;
-    this.length = new Int64();
-    this.buffer = new Uint8Array(64);
-    this.bufferLength = 0;
-  }
-
-  reset() {
-    initState.forEach((v, i) => { this.state[i] = v; });
-    this.clean = true;
-    this.length.val = 0;
-    this.buffer.fill(0);
-    this.bufferLength = 0;
-  }
-
-  endData(data) {
-    this.feedData(data);
-
-    // finalize padding
-    this.buffer[this.bufferLength] = 0b10000000; // add a single '1' bit
-    this.buffer.fill(0, this.bufferLength + 1);
-    if (this.bufferLength >= 56) {
-      // no sufficient space for writing padding length
-      this.mainLoop();
-      this.buffer.fill(0);
-    }
-    this.buffer.set(this.length.loBytesLE, 56);
-    this.buffer.set(this.length.hiBytesLE, 60);
-    this.mainLoop();
-
-    const result = new Uint8Array(Uint32Array.of(...this.state).buffer);
-    this.reset();
-    return result;
+  constructor() {
+    super(MD5Hash, 'MD5');
   }
 
   mainLoop() {
     md5MainLoop(this.state, this.buffer);
   }
 
-  feedData(data) {
-    if (data.length === 0) {
-      return;
-    }
-
-    this.clean = false;
-    let pos = 0;
-    while (pos < data.length) {
-      const len = Math.min(data.length - pos, this.buffer.length - this.bufferLength);
-      this.buffer.set(data.slice(pos, pos + len), this.bufferLength);
-      this.bufferLength += len;
-      pos += len;
-      if (this.bufferLength === 64) {
-        this.mainLoop();
-        this.bufferLength = 0;
-      }
-    }
-
-    this.length.addNumberToLength(data.length * 8);
+  initState() {
+    this.state = new Uint32Array(4);
   }
 
+  resetState() {
+    initState.forEach((v, i) => { this.state[i] = v; });
+  }
+
+  exportState() {
+    return new Uint8Array(Uint32Array.of(...this.state).buffer);
+  }
 
   static hash(data) {
     return new MD5Hash().hash(data);
