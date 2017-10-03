@@ -5,6 +5,9 @@ const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
   Encode.Base16Encoder.encode(MD5Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))))),
 ).toEqual(md.toUpperCase()));
 
+// Here cen use OpenSSL as reference implementation,
+// echo -n "message" | openssl dgst -md5
+
 const testCases = [
   ['', 'd41d8cd98f00b204e9800998ecf8427e'],
   ['\0', '93b885adfe0da089cdf634904fd59f71'],
