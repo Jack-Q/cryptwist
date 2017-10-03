@@ -97,4 +97,13 @@ export class MD4HashBase extends Hash {
   }
 }
 
+// export state as big-endian format
+export const exportUint8ArrayBE = state =>
+  Uint8Array.from(Array.from(state).map(i => [
+    (i >>> 24) & 0xff,
+    (i >>> 16) & 0xff,
+    (i >>> 8) & 0xff,
+    (i >>> 0) & 0xff,
+  ]).reduce((a, b) => a.concat(b)));
+
 export default MD4HashBase;

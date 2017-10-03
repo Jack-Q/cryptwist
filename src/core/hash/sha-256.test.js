@@ -6,7 +6,7 @@ const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
 ).toEqual(md.toUpperCase()));
 
 // Here cen use OpenSSL as reference implementation,
-// echo -n "message" | openssl dgst -sha1
+// echo -n "message" | openssl dgst -sha256
 
 const testCases = [
   ['', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
@@ -20,4 +20,4 @@ testCases.forEach(i => test(...i));
 
 it('should hash large data correctly', () => expect(
   Encode.Base16Encoder.encode(SHA256Hash.hash(new Uint8Array(12000))),
-).toEqual('69011D94AE0D50D20321C0BE964C7257'));
+).toEqual('FF6698A6E831FFCF47AF2FED388FFC262F319E72B26CD140929D1E19B1246AD4'));
