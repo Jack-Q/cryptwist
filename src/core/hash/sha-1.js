@@ -2,7 +2,11 @@ import {
   MD4HashBase,
 } from './md4-family/base';
 
+
+// use little endian format for numerical value representation
 const initState = Uint32Array.of(0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0);
+
+const yTable = Uint32Array.of(0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6);
 
 /**
  *
@@ -11,6 +15,8 @@ const initState = Uint32Array.of(0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476,
  */
 const sha1MainLoop = (state, buffer) => {
   let [a, b, c, d, e] = state;
+
+  // for buffer expansion
   const internalBuffer = new Uint32Array(16);
 
   for (let i = 0; i < 80; i += 1) {
@@ -19,32 +25,33 @@ const sha1MainLoop = (state, buffer) => {
 
     if (i < 20) {
       f = (b & c) | (~b & d);
-      y = 0x5A827999;
+      y = yTable[0];
     } else if (i < 40) {
       f = b ^ c ^ d;
-      y = 0x6ED9EBA1;
+      y = yTable[1];
     } else if (i < 60) {
       f = (b & c) | (b & d) | (c & d);
-      y = 0x8F1BBCDC;
+      y = yTable[2];
     } else {
       f = b ^ c ^ d;
-      y = 0xCA62C1D6;
+      y = yTable[3];
     }
 
     // message buffer and expansion
     const j = i & 0xf;
     if (i < 16) {
+      // SHA-1 is conforming big-endian pattern
       internalBuffer[i] =
-        (buffer[i * 4 + 3] << 24) |
-        (buffer[i * 4 + 2] << 16) |
-        (buffer[i * 4 + 1] << 8) |
-        (buffer[i * 4 + 0] << 0);
+        (buffer[i * 4 + 0] << 24) |
+        (buffer[i * 4 + 1] << 16) |
+        (buffer[i * 4 + 2] << 8) |
+        (buffer[i * 4 + 3] << 0);
     } else {
       internalBuffer[j] =
         internalBuffer[(j + 13) & 0xf] ^
         internalBuffer[(j + 8) & 0xf] ^
         internalBuffer[(j + 2) & 0xf] ^
-        internalBuffer[j];
+        internalBuffer[(j + 0) & 0xf];
       internalBuffer[j] =
         (internalBuffer[j] << 1) | (internalBuffer[j] >>> (32 - 1));
     }
@@ -72,7 +79,7 @@ const sha1MainLoop = (state, buffer) => {
 export class SHA1Hash extends MD4HashBase {
 
   constructor() {
-    super(SHA1Hash, 'SHA-1');
+    super(SHA1Hash, 'SHA-1', 'BE');
   }
 
   mainLoop() {
@@ -90,7 +97,13 @@ export class SHA1Hash extends MD4HashBase {
   }
 
   exportState() {
-    return new Uint8Array(Uint32Array.of(...this.state).buffer);
+    // export state as big-endian format
+    return Uint8Array.from(Array.from(this.state).map(i => [
+      (i >>> 24) & 0xff,
+      (i >>> 16) & 0xff,
+      (i >>> 8) & 0xff,
+      (i >>> 0) & 0xff,
+    ]).reduce((a, b) => a.concat(b)));
   }
 
   static hash(data) {

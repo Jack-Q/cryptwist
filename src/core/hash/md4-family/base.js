@@ -2,10 +2,11 @@ import { Hash, TODO } from '../../base/api';
 import { Int64 } from '../../util/int64';
 
 export class MD4HashBase extends Hash {
-  constructor(HashClass, name) {
+  constructor(HashClass, name, endian = 'LE') {
     super();
     this.HashClass = HashClass;
     this.name = name;
+    this.endian = endian;
   }
 
   hash(data) {
@@ -43,8 +44,13 @@ export class MD4HashBase extends Hash {
       this.mainLoop();
       this.buffer.fill(0);
     }
-    this.buffer.set(this.length.loBytesLE, 56);
-    this.buffer.set(this.length.hiBytesLE, 60);
+    if (this.endian === 'LE') {
+      this.buffer.set(this.length.loBytesLE, 56);
+      this.buffer.set(this.length.hiBytesLE, 60);
+    } else {
+      this.buffer.set(this.length.hiBytesBE, 56);
+      this.buffer.set(this.length.loBytesBE, 60);
+    }
     this.mainLoop();
 
     const result = this.exportState();
