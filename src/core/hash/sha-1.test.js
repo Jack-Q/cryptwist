@@ -18,6 +18,6 @@ const testCases = [
 
 testCases.forEach(i => test(...i));
 
-// it('should hash large data correctly', () => expect(
-//   Encode.Base16Encoder.encode(SHA1Hash.hash(new Uint8Array(12000))),
-// ).toEqual('69011D94AE0D50D20321C0BE964C7257'));
+it('should hash large data correctly', () => expect(
+  Encode.Base16Encoder.encode(SHA1Hash.hash(new Uint8Array(12000))),
+).toEqual('7C400C3BCAB607A35F48F4A64076E23E0FB71846'));
