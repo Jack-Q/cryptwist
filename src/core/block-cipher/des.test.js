@@ -28,3 +28,6 @@ const tripleDecrypt = s =>
 it('triple encryption', expect(tripleEncrypt('5468652071756663')).toEqual('A826FD8CE53B855F'));
 it('triple decryption', expect(tripleDecrypt('A826FD8CE53B855F')).toEqual('5468652071756663'));
 
+// for more test case, we can treat OpenSSL as reference implementation
+// use following to encrypt message (with padding bytes) with key
+// echo -n "message" | openssl des-ecb -nosalt -a -K "Base16 encoded key string"

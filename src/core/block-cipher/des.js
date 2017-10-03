@@ -49,7 +49,7 @@ export class DESBlockCipher extends BlockCipher {
 
   decrypt(cipher) {
     if (cipher.length !== 8) {
-      throw 'DES requires the length of cipher for encryption is 64 bits (8 bytes)';
+      throw 'DES requires the length of cipher for decryption is 64 bits (8 bytes)';
     }
     return desCore(cipher, this.subKey.map(i => i).reverse());
   }

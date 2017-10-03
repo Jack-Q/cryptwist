@@ -1,5 +1,7 @@
 import { prga, ksa, RC4StreamCipher } from './rc4';
-import Base64 from '../encode/base64';
+import Encoder from '../encode/index';
+
+const { Base64Encoder: Base64 } = Encoder;
 
 const key = Base64.decode('ZSDAABC45sD+CC+=');
 const cipher = new RC4StreamCipher(key);
@@ -18,3 +20,6 @@ it('should validate the length of key longer then minimal', () => expect(() =>
 it('should validate the length of key shorter then the maximal', () => expect(() =>
   new RC4StreamCipher(Uint8Array.from(Array(260).fill(0))).stream).toThrow(/length/));
 
+// for more test case, we can treat OpenSSL as reference implementation
+// use following to encrypt message (with padding bytes) with key
+// echo -n "message" | openssl rc4 -nosalt -a -K "Base16 encoded key string"

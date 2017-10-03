@@ -22,7 +22,9 @@ export const checkKey = (key) => {
 
   // check bits parity
   if (!key.every(checkParity)) {
-    throw 'Parity check failed for DES key';
+    // bit parity checking should be an warning since
+    // lots of current implemetation in practice ignores them
+    console.warn('Parity check failed for DES key');
   }
 
   const keyCore = new Uint8Array(7).fill(0)
