@@ -32,9 +32,9 @@ The core module components provide functionality for specific tasks.
  * [ ] CTR: Counter
 
 ### Hash Functions
- * [ ] MD4
+ * [x] MD4
  * [x] MD5
- * [ ] SHA-1
+ * [x] SHA-1
  * [ ] SHA-2
    - [ ] SHA-256
    - [ ] SHA-384
