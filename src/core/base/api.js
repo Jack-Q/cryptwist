@@ -16,6 +16,7 @@ export class Hash {
 
 export class BlockCipher {
   key;
+  constructor(key) { this.key = key; }
   encrypt(data) { return TODO([this, data]); }
   decrypt(cipher) { return TODO([this, cipher]); }
 }
