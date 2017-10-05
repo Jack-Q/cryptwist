@@ -37,7 +37,8 @@ The core module components provide functionality for specific tasks.
  * [x] MD5
  * [x] SHA-1 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
  * [ ] SHA-2 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
-   - [ ] SHA-256
+   - [x] SHA-224
+   - [x] SHA-256
    - [ ] SHA-384
    - [ ] SHA-512
  * [ ] SHA-3 (Keccak) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf))
@@ -55,7 +56,7 @@ The core module components provide functionality for specific tasks.
  * [x] 3DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
  * [ ] IDEA
  * [ ] RC5
- * [ ] AES (Rijndeal) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf))
+ * [x] AES (Rijndeal) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf))
  * [ ] Twofish
  * [ ] Blowfish
  * [ ] CAST5
