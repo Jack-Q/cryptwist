@@ -2,13 +2,6 @@ import { Hash, TODO } from '../../base/api';
 import { Int64, Int128 } from '../../util/big-int';
 
 export class MD4HashBase extends Hash {
-  constructor(HashClass, name, endian = 'LE', largeBuffer = false) {
-    super();
-    this.HashClass = HashClass;
-    this.name = name;
-    this.endian = endian;
-    this.largeBuffer = largeBuffer;
-  }
 
   hash(data) {
     if (this.clean) {
@@ -18,7 +11,12 @@ export class MD4HashBase extends Hash {
     return this.HashClass.hash(data);
   }
 
-  init() {
+  init(HashClass, name, endian = 'LE', largeBuffer = false) {
+    this.HashClass = HashClass;
+    this.name = name;
+    this.endian = endian;
+    this.largeBuffer = largeBuffer;
+
     this.initState();
     this.clean = true;
     this.length = this.largeBuffer ? new Int128() : new Int64();
