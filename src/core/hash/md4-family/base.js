@@ -1,12 +1,13 @@
 import { Hash, TODO } from '../../base/api';
-import { Int64 } from '../../util/int64';
+import { Int64, Int128 } from '../../util/big-int';
 
 export class MD4HashBase extends Hash {
-  constructor(HashClass, name, endian = 'LE') {
+  constructor(HashClass, name, endian = 'LE', largeBuffer = false) {
     super();
     this.HashClass = HashClass;
     this.name = name;
     this.endian = endian;
+    this.largeBuffer = largeBuffer;
   }
 
   hash(data) {
@@ -20,8 +21,8 @@ export class MD4HashBase extends Hash {
   init() {
     this.initState();
     this.clean = true;
-    this.length = new Int64();
-    this.buffer = new Uint8Array(64);
+    this.length = this.largeBuffer ? new Int128() : new Int64();
+    this.buffer = new Uint8Array(this.largeBuffer ? 128 : 64);
     this.bufferLength = 0;
   }
 
@@ -35,22 +36,20 @@ export class MD4HashBase extends Hash {
 
   endData(data) {
     this.feedData(data);
+    const originalLength = this.endian === 'LE' ? this.length.bytesLE : this.length.bytesBE;
+    const lengthFieldOffset = this.buffer.length - originalLength.length;
 
-      // finalize padding
+    // finalize padding
     this.buffer[this.bufferLength] = 0b10000000; // add a single '1' bit
     this.buffer.fill(0, this.bufferLength + 1);
-    if (this.bufferLength >= 56) {
+
+    if (this.bufferLength >= lengthFieldOffset) {
         // no sufficient space for writing padding length
       this.mainLoop();
       this.buffer.fill(0);
     }
-    if (this.endian === 'LE') {
-      this.buffer.set(this.length.loBytesLE, 56);
-      this.buffer.set(this.length.hiBytesLE, 60);
-    } else {
-      this.buffer.set(this.length.hiBytesBE, 56);
-      this.buffer.set(this.length.loBytesBE, 60);
-    }
+
+    this.buffer.set(originalLength, lengthFieldOffset);
     this.mainLoop();
 
     const result = this.exportState();
@@ -70,7 +69,7 @@ export class MD4HashBase extends Hash {
       this.buffer.set(data.slice(pos, pos + len), this.bufferLength);
       this.bufferLength += len;
       pos += len;
-      if (this.bufferLength === 64) {
+      if (this.bufferLength === this.buffer.length) {
         this.mainLoop();
         this.bufferLength = 0;
       }
