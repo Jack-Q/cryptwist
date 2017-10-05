@@ -5,7 +5,10 @@ import Base85Encoder from './base85';
 import HexEncoder from './hex';
 import AsciiArmoredEncoder from './ascii-armored';
 
-const encoders = [Base16Encoder, Base32Encoder, Base64Encoder, Base85Encoder, AsciiArmoredEncoder, HexEncoder];
+const encoders = [
+  Base16Encoder, Base32Encoder,
+  Base64Encoder, Base85Encoder,
+  AsciiArmoredEncoder, HexEncoder];
 
 const Encoder = {
   Base64Encoder,
