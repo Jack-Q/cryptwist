@@ -12,68 +12,12 @@
 
 import { BlockCipher } from '../base/api';
 
-import { initState, exportState } from './rijndael/state';
-
-import { expandKey } from './rijndael/expand-key';
-
-import { subBytes, invSubBytes } from './rijndael/sub-bytes';
-import { shiftRows, invShiftRows } from './rijndael/shift-rows';
-import { mixColumns, invMixColumns } from './rijndael/mix-columns';
+import { encrypt, decrypt, expandKey } from './rijndael/core';
 
 const checkKey = (key) => {
 
 };
 
-
-const addRoundKey = (state, key, index) => {
-  for (let i = 0; i < 4; i += 1) {
-    state.u8[0 * 4 + i] ^= ((key[index * 4 + i] >>> 0) & 0xff);
-    state.u8[1 * 4 + i] ^= ((key[index * 4 + i] >>> 8) & 0xff);
-    state.u8[2 * 4 + i] ^= ((key[index * 4 + i] >>> 16) & 0xff);
-    state.u8[3 * 4 + i] ^= ((key[index * 4 + i] >>> 24) & 0xff);
-  }
-};
-
-
-const aesCore = (data, subKey) => {
-  const nR = subKey.length / 4 - 1;
-  // state is a byte buffer with uint32/uint8 view
-  const state = initState(data);
-
-  addRoundKey(state, subKey, 0);
-  for (let i = 1; i < nR; i += 1) {
-    subBytes(state);
-    shiftRows(state);
-    mixColumns(state);
-    addRoundKey(state, subKey, i);
-  }
-  subBytes(state);
-  shiftRows(state);
-  addRoundKey(state, subKey, nR);
-
-  const result = exportState(state);
-  return result;
-};
-
-const invAesCore = (cipher, subKey) => {
-  const nR = subKey.length / 4 - 1;
-  // state is a byte buffer with uint32/uint8 view
-  const state = initState(cipher);
-
-  addRoundKey(state, subKey, nR);
-  for (let i = nR - 1; i > 0; i -= 1) {
-    invShiftRows(state);
-    invSubBytes(state);
-    addRoundKey(state, subKey, i);
-    invMixColumns(state);
-  }
-  invShiftRows(state);
-  invSubBytes(state);
-  addRoundKey(state, subKey, 0);
-
-  const result = exportState(state);
-  return result;
-};
 
 export class AES128BlockCipher extends BlockCipher {
 
@@ -91,14 +35,14 @@ export class AES128BlockCipher extends BlockCipher {
     if (data.length !== 16) {
       throw 'AES-128 requires the length of data block for encryption is 128 bits (16 bytes)';
     }
-    return aesCore(data, this.subKey);
+    return encrypt(data, this.subKey);
   }
 
   decrypt(cipher) {
     if (cipher.length !== 16) {
       throw 'AES-128 requires the length of cipher for encryption is 128 bits (16 bytes)';
     }
-    return invAesCore(cipher, this.subKey);
+    return decrypt(cipher, this.subKey);
   }
 }
 
