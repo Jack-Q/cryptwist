@@ -16,9 +16,9 @@ import { initState, exportState } from './rijndael/state';
 
 import { expandKey } from './rijndael/expand-key';
 
-import { subBytes } from './rijndael/sub-bytes';
-import { shiftRows } from './rijndael/shift-rows';
-import { mixColumns } from './rijndael/mix-columns';
+import { subBytes, invSubBytes } from './rijndael/sub-bytes';
+import { shiftRows, invShiftRows } from './rijndael/shift-rows';
+import { mixColumns, invMixColumns } from './rijndael/mix-columns';
 
 const checkKey = (key) => {
 
@@ -55,6 +55,26 @@ const aesCore = (data, subKey) => {
   return result;
 };
 
+const invAesCore = (cipher, subKey) => {
+  const nR = subKey.length / 4 - 1;
+  // state is a byte buffer with uint32/uint8 view
+  const state = initState(cipher);
+
+  addRoundKey(state, subKey, nR);
+  for (let i = nR - 1; i > 0; i -= 1) {
+    invShiftRows(state);
+    invSubBytes(state);
+    addRoundKey(state, subKey, i);
+    invMixColumns(state);
+  }
+  invShiftRows(state);
+  invSubBytes(state);
+  addRoundKey(state, subKey, 0);
+
+  const result = exportState(state);
+  return result;
+};
+
 export class AES128BlockCipher extends BlockCipher {
 
   constructor(key) {
@@ -78,7 +98,7 @@ export class AES128BlockCipher extends BlockCipher {
     if (cipher.length !== 16) {
       throw 'AES-128 requires the length of cipher for encryption is 128 bits (16 bytes)';
     }
-    return aesCore(cipher, this.subKey.map(i => i).reverse());
+    return invAesCore(cipher, this.subKey);
   }
 }
 

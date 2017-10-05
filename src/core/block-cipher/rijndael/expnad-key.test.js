@@ -19,7 +19,6 @@ const exp = [
 ];
 const result = encode(new Uint8Array(expandKey(key).buffer));
 
-console.log(result);
 for (let i = 0; i <= 10; i += 1) {
   it(`should expand the ${i + 1}(-th) section as expectation`, () =>
     expect(result.slice(i * 32, i * 32 + 32)).toEqual(exp[i]));

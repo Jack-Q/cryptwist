@@ -11,7 +11,7 @@ const aseTest = ({ key, msg, result }) => {
   const cipher = new AES128BlockCipher(key);
 
   it('should encrypt message correctly', () => expect(w(cipher.encrypt(msg))).toEqual(w(result)));
-  // it('should decrypt message correctly', () => expect(w(cipher.decrypt(result))).toEqual(w(msg)));
+  it('should decrypt message correctly', () => expect(w(cipher.decrypt(result))).toEqual(w(msg)));
 };
 [
   {
