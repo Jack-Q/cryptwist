@@ -11,13 +11,13 @@ export class MD4HashBase extends Hash {
     return this.HashClass.hash(data);
   }
 
-  init(HashClass, name, endian = 'LE', largeBuffer = false) {
+  init(HashClass, name, endian = 'LE', largeBuffer = false, ...params) {
     this.HashClass = HashClass;
     this.name = name;
     this.endian = endian;
     this.largeBuffer = largeBuffer;
 
-    this.initState();
+    this.initState(...params);
     this.clean = true;
     this.length = this.largeBuffer ? new Int128() : new Int64();
     this.buffer = new Uint8Array(this.largeBuffer ? 128 : 64);
