@@ -57,7 +57,7 @@ export class MD4HashBase extends Hash {
   }
 
   feedData(data) {
-    if (data.length === 0) {
+    if (data === undefined || data.length === 0) {
       return;
     }
 
