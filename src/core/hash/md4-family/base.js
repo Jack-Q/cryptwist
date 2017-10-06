@@ -8,10 +8,11 @@ export class MD4HashBase extends Hash {
       return this.endData(data);
     }
     // use static method to construct new hash
-    return this.HashClass.hash(data);
+    return this.HashClass.hash(data, ...this.params);
   }
 
   init(HashClass, name, endian = 'LE', largeBuffer = false, ...params) {
+    this.params = params;
     this.HashClass = HashClass;
     this.name = name;
     this.endian = endian;
