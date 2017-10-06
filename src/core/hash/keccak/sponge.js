@@ -41,10 +41,10 @@ export class Sponge extends Hash {
     }
 
     // keep squeezing the sponge until the digest of desired length is filled
-    const result = new Uint8Array(this.digestLen);
+    const result = new Uint8Array(this.digestLen / 8);
     for (let l = 0; l < result.length; l += this.buffer.length) {
       this.squeezeData();
-      result.set(this.buffer, l);
+      result.set(this.buffer.slice(0, Math.min(this.buffer.length, result.length - l)), l);
       this.func();
     }
     this.reset();

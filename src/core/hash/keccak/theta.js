@@ -24,7 +24,7 @@ export const theta = (state) => {
     const d1 = retrieve(c, (x + 4) % 5);
     const d2 = retrieve(cs, (x + 1) % 5);
     const d = [d1[0] ^ d2[0], d1[1] ^ d2[1]];
-    for (let y = 0; y < 5; j += 1) {
+    for (let y = 0; y < 5; y += 1) {
       const l = retrieve(state, index(x, y));
       assign(state, index(x, y), ...[
         l[0] ^ d[0],
