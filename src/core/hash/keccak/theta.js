@@ -32,5 +32,7 @@ export const theta = (state) => {
       ]);
     }
   }
+
+  return state;
 };
 export default theta;
