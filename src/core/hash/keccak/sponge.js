@@ -34,9 +34,9 @@ export class Sponge extends Hash {
   endData(data) {
     this.feedData(data);
     // padding
-    const paddingResult = { finish: false };
+    let paddingResult = { finish: false };
     while (!paddingResult.finish) {
-      this.pad(paddingResult);
+      paddingResult = this.pad(paddingResult);
       this.func();
     }
 
@@ -108,6 +108,16 @@ export class Sponge extends Hash {
 
   func() { TODO(this); }
 
+  /**
+   * This is used to handle padding for message
+   *
+   * if the padding for certain state of buffer requires more buffers to support,
+   * a implementation can return a padding result with unfinished state, and store required
+   * padding algorithm state in the padding result, which will be passed to the function next time
+   *
+   * @param {{finish: boolean}} paddingResult
+   * @returns {{finish: boolean}} indicate the padding process is finished over current buffer
+   */
   pad(paddingResult) { TODO([this, paddingResult]); }
 
 }
