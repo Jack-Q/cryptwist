@@ -1,13 +1,13 @@
 import { Keccak } from './keccak/keccak';
 
-export class SHA3_256 extends Keccak {
+export class SHA3_256Hash extends Keccak {
   constructor() {
-    super(SHA3_256, 'SHA3-256', 512, 256);
+    super(SHA3_256Hash, 'SHA3-256', 512, 256);
   }
 
   static hash(data) {
-    return new SHA3_256().hash(data);
+    return new SHA3_256Hash().hash(data);
   }
 }
 
-export default SHA3_256;
+export default SHA3_256Hash;
