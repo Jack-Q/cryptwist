@@ -1,10 +1,10 @@
-import { assign, retrieve, index, rotR } from './util';
+import { assign, retrieve, index, rotL } from './util';
 
 export const rho = (state) => {
   for (let t = 0, x = 1, y = 0; t < 24; t += 1) {
     // shift the index
     assign(state, index(x, y),
-      ...rotR(
+      ...rotL(
         ...retrieve(state, index(x, y)),
         ((t + 1) * (t + 2) / 2) % 64,
       ),

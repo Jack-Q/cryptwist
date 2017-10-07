@@ -1,4 +1,4 @@
-import { assign, retrieve, index, rotR } from './util';
+import { assign, retrieve, index, rotL } from './util';
 
 export const theta = (state) => {
   const c = new Uint32Array(5 * 2);
@@ -14,7 +14,7 @@ export const theta = (state) => {
       c0[0] ^ c1[0] ^ c2[0] ^ c3[0] ^ c4[0],
       c0[1] ^ c1[1] ^ c2[1] ^ c3[1] ^ c4[1],
     ];
-    const csi = rotR(...ci, 1);
+    const csi = rotL(...ci, 1);
     assign(c, i, ...ci);
     assign(cs, i, ...csi);
   }

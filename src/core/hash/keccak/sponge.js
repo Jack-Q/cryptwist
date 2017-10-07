@@ -37,6 +37,7 @@ export class Sponge extends Hash {
     let paddingResult = { finish: false };
     while (!paddingResult.finish) {
       paddingResult = this.pad(paddingResult);
+      this.absorbData();
       this.func();
     }
 
@@ -84,12 +85,17 @@ export class Sponge extends Hash {
    * Absorb data from internal buffer to current state (the sponge)
    */
   absorbData() {
-    for (let i = 0; i < this.rate / 32; i += 1) {
-      this.state[i] ^=
-        this.buffer[i * 4 + 0] << 24 |
-        this.buffer[i * 4 + 1] << 16 |
-        this.buffer[i * 4 + 2] << 8 |
-        this.buffer[i * 4 + 3] << 0;
+    for (let i = 0; i < this.rate / 64; i += 1) {
+      this.state[i * 2] ^=
+        this.buffer[i * 8 + 7] << 24 |
+        this.buffer[i * 8 + 6] << 16 |
+        this.buffer[i * 8 + 5] << 8 |
+        this.buffer[i * 8 + 4] << 0;
+      this.state[i * 2 + 1] ^=
+        this.buffer[i * 8 + 3] << 24 |
+        this.buffer[i * 8 + 2] << 16 |
+        this.buffer[i * 8 + 1] << 8 |
+        this.buffer[i * 8 + 0] << 0;
     }
   }
 
@@ -97,12 +103,17 @@ export class Sponge extends Hash {
    * Squeeze data into internal buffer from current state (the sponge)
    */
   squeezeData() {
-    for (let i = 0; i < this.rate / 32; i += 1) {
-      const s = this.state[i];
-      this.buffer[i * 4 + 0] = (s >> 24) & 0xff;
-      this.buffer[i * 4 + 1] = (s >> 16) & 0xff;
-      this.buffer[i * 4 + 2] = (s >> 8) & 0xff;
-      this.buffer[i * 4 + 3] = (s >> 0) & 0xff;
+    for (let i = 0; i < this.rate / 64; i += 1) {
+      const s1 = this.state[i * 2];
+      this.buffer[i * 8 + 7] = (s1 >> 24) & 0xff;
+      this.buffer[i * 8 + 6] = (s1 >> 16) & 0xff;
+      this.buffer[i * 8 + 5] = (s1 >> 8) & 0xff;
+      this.buffer[i * 8 + 4] = (s1 >> 0) & 0xff;
+      const s2 = this.state[i * 2 + 1];
+      this.buffer[i * 8 + 3] = (s2 >> 24) & 0xff;
+      this.buffer[i * 8 + 2] = (s2 >> 16) & 0xff;
+      this.buffer[i * 8 + 1] = (s2 >> 8) & 0xff;
+      this.buffer[i * 8 + 0] = (s2 >> 0) & 0xff;
     }
   }
 
