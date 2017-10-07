@@ -5,8 +5,8 @@ const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
   Encode.Base16Encoder.encode(SHA3_256Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))))),
 ).toEqual(md.toUpperCase()));
 
-// Here cen use OpenSSL as reference implementation,
-// echo -n "message" | openssl dgst -sha256
+// Here cen use libdigest-sha3-perl (Debian) package which provides an global command
+// echo -n "message" | sha3sum -a 256
 
 const testCases = [
   ['', 'a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a'],
