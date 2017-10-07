@@ -36,12 +36,18 @@ The core module components provide functionality for specific tasks.
  * [x] MD4
  * [x] MD5
  * [x] SHA-1 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
- * [ ] SHA-2 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
+ * [x] SHA-2 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
    - [x] SHA-224
    - [x] SHA-256
-   - [ ] SHA-384
-   - [ ] SHA-512
- * [ ] SHA-3 (Keccak) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf))
+   - [x] SHA-384
+   - [x] SHA-512
+ * [x] SHA-3 (Keccak) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf))
+   - [x] SHA3-224
+   - [x] SHA3-256
+   - [x] SHA3-384
+   - [x] SHA3-512
+   - [x] SHAKE-128 XOF
+   - [x] SHAKE-256 XOF
 
 ### Pseudo-Random Number Generators / Stream Ciphers
  * [x] RC4
