@@ -1,25 +1,25 @@
 # Cryptwist
 
-> Cryptographic Algorithm Visualization
+> Cryptographic Primitive Implementation and Visualization
 
 ## Core Module Components
 
-The core module components provide functionality for specific tasks. 
+The core module contains implementation of various cryptographic primitives.
 
 ### Encoding Methods
-* [-] Base64
+* [ ] Base64
   - [x] Basic Base64 ([RFC4648 (Section-4)](https://tools.ietf.org/html/rfc4648#section-4))
     + [ ] Without Padding ([RFC7515 (Appendix-C)](https://tools.ietf.org/html/rfc7515#appendix-C))
   - [ ] URL Compatible Base64 ([RFC4648 (Section-5)](https://tools.ietf.org/html/rfc4648#section-5))
   - [ ] GPG Ascii Armoring Variant ([RFC4880 (Section-6)](https://tools.ietf.org/html/rfc4880#section-6))
-* [-] Base32
-  - [-] Basic Base32 ([RFC4648 (Section-6)](https://tools.ietf.org/html/rfc4648#section-6))
+* [ ] Base32
+  - [ ] Basic Base32 ([RFC4648 (Section-6)](https://tools.ietf.org/html/rfc4648#section-6))
     + [ ] Decoder Character Replacement (0 -> O, 1 -> I)
     + [ ] Decoder Character Case (lower to upper) & Replacement (1 -> l, I -> l)
   - [x] Base32 Hex Ext ([RFC4648 (Section-7)](https://tools.ietf.org/html/rfc4648#section-7))
 * [x] Base16 ([RFC4648 (Section-8)](https://tools.ietf.org/html/rfc4648#section-8))
 * [ ] Base36
-* [-] Base85
+* [ ] Base85
   - [ ] btoa version
   - [x] Ascii85 (Adobe)
 
@@ -33,8 +33,10 @@ The core module components provide functionality for specific tasks.
  * [ ] CTR: Counter
 
 ### Hash Functions
+ * [ ] MD2 ([RFC1319](https://tools.ietf.org/html/rfc1319))
  * [x] MD4
- * [x] MD5
+ * [x] MD5 ([RFC1321](https://tools.ietf.org/html/rfc1321))
+ * [ ] RIPEMD160
  * [x] SHA-1 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
  * [x] SHA-2 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
    - [x] SHA-224
@@ -48,6 +50,9 @@ The core module components provide functionality for specific tasks.
    - [x] SHA3-512
    - [x] SHAKE-128 XOF
    - [x] SHAKE-256 XOF
+
+### Message Authentication Codes 
+ * [ ] HMAC (Keyed-Hashing for Message Authentication) ([RFC2104](https://tools.ietf.org/html/rfc2104))
 
 ### Pseudo-Random Number Generators / Stream Ciphers
  * [x] RC4
@@ -75,6 +80,13 @@ The core module components provide functionality for specific tasks.
  * [ ] ECDSA
 
 ### Compression Algorithms
+ 
+
+### Key Derivation Function 
+ * [ ] PBKDF1 (Password Based Key Derivation Function) ([RFC8018](https://tools.ietf.org/html/rfc8018))
+ * [ ] PBKDF2 (Password Based Key Derivation Function) ([RFC8018](https://tools.ietf.org/html/rfc8018))
+ * [ ] HKDF (HMAC Based Key Derivation Function) ([RFC 5869](https://tools.ietf.org/html/rfc5869))
+ * [ ] Argon2 ([Spec on GitHub](https://github.com/P-H-C/phc-winner-argon2/blob/master/argon2-specs.pdf))
 
 ## Build Setup
 
