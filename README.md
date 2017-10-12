@@ -33,7 +33,7 @@ The core module contains implementation of various cryptographic primitives.
  * [ ] CTR: Counter
 
 ### Hash Functions
- * [ ] MD2 ([RFC1319](https://tools.ietf.org/html/rfc1319))
+ * [x] MD2 ([RFC1319](https://tools.ietf.org/html/rfc1319))
  * [x] MD4
  * [x] MD5 ([RFC1321](https://tools.ietf.org/html/rfc1321))
  * [ ] RIPEMD
@@ -84,7 +84,9 @@ The core module contains implementation of various cryptographic primitives.
  * [ ] ECDSA
 
 ### Compression Algorithms
- 
+ * [ ] Zlib format ([RFC1950](https://tools.ietf.org/html/rfc1950))
+ * [ ] DEFLATE format (ZIP format) ([RFC1951](https://tools.ietf.org/html/rfc1951))
+ * [ ] BZip2 format ([RFC1952](https://tools.ietf.org/html/rfc1952))
 
 ### Key Derivation Function 
  * [ ] PBKDF1 (Password Based Key Derivation Function) ([RFC8018](https://tools.ietf.org/html/rfc8018))
