@@ -1,7 +1,9 @@
 import { MD4HashBase } from './md4-family/base';
 
+// 20 bytes initial state, add an extra value to MD4/MD5
 const initState = Uint32Array.of(0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0);
 
+// Z constants is used as a index of message buffer
 const zl = [
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
   7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8,
@@ -17,9 +19,11 @@ const zr = [
   12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11,
 ];
 
+// Y constants is used as a additional term for each 16 rounds
 const yl = [0, 0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xa953fd4e];
 const yr = [0x50a28be6, 0x5c4dd124, 0x6d703ef3, 0x7a6d76e9, 0];
 
+// S constants is used as a shift amount of round result
 const sl = [
   11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8,
   7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12,
@@ -41,10 +45,13 @@ const sr = [
  * @param {Uint8Array} buffer
  */
 const ripemd160MainLoop = (state, buffer) => {
+  // RIPEMD-160 includes a parallel processing rounds
+  // which denotes as left rounds and right rounds
   let [al, bl, cl, dl, el] = state;
   let [ar, br, cr, dr, er] = state;
 
   for (let i = 0; i < 80; i += 1) {
+    // RIPEMD-160 follows big little mode
     const gl = zl[i];
     const mgl =
       (buffer[gl * 4 + 3] << 24) |
@@ -60,6 +67,8 @@ const ripemd160MainLoop = (state, buffer) => {
       (buffer[gr * 4 + 0] << 0);
 
     let tl = 0; let tr = 0;
+
+    // the order of primitive manipulation is reversed from left rounds to right rounds
     if (i < 16) {
       tl = bl ^ cl ^ dl;
       tr = br ^ (cr | ~dr);
