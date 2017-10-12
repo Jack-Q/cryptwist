@@ -34,13 +34,13 @@ The core module contains implementation of various cryptographic primitives.
 
 ### Hash Functions
  * [x] MD2 ([RFC1319](https://tools.ietf.org/html/rfc1319))
- * [x] MD4
+ * [x] MD4 ([RFC1319](https://tools.ietf.org/html/rfc1320))
  * [x] MD5 ([RFC1321](https://tools.ietf.org/html/rfc1321))
- * [ ] RIPEMD
-   - [ ] RIPEMD 128 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd128.txt))
+ * [x] RIPEMD
+   - [x] RIPEMD 128 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd128.txt))
    - [x] RIPEMD 160 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd160.txt))
-   - [ ] RIPEMD 256 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd256.txt))
-   - [ ] RIPEMD 320 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd320.txt))
+   - [x] RIPEMD 256 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd256.txt))
+   - [x] RIPEMD 320 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd320.txt))
  * [x] SHA-1 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
  * [x] SHA-2 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
    - [x] SHA-224
@@ -69,12 +69,21 @@ The core module contains implementation of various cryptographic primitives.
 ### Symmetric-Key Algorithms
  * [x] DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
  * [x] 3DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
- * [ ] IDEA
+ * [ ] IDEA ([PAPER](http://www.isiweb.ee.ethz.ch/papers/arch/xlai-mass-inspec-1991-2.pdf))
  * [ ] RC5
  * [x] AES (Rijndeal) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf))
- * [ ] Twofish
+   - [x] AES-128
+   - [x] AES-192
+   - [x] AES-256
  * [ ] Blowfish
- * [ ] CAST5
+ * [ ] Twofish
+ * [ ] CAST5 (CAST-128) ([RFC2144](https://tools.ietf.org/html/rfc2144))
+ * [ ] CAST6 (CAST-256) ([RFC2612](https://tools.ietf.org/html/rfc2612))
+ * [ ] Camellia ([RFC3713](https://tools.ietf.org/html/rfc3713))
+   - [ ] Camellia-128
+   - [ ] Camellia-192
+   - [ ] Camellia-256
+ * [ ] SEED ([RFC4269](https://tools.ietf.org/html/rfc4269))
 
 ### Public-Key Algorithms
  * [ ] RSA
