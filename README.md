@@ -37,10 +37,10 @@ The core module contains implementation of various cryptographic primitives.
  * [x] MD4
  * [x] MD5 ([RFC1321](https://tools.ietf.org/html/rfc1321))
  * [ ] RIPEMD
-   - [ ] RIPEMD 128
-   - [x] RIPEMD 160
-   - [ ] RIPEMD 256
-   - [ ] RIPEMD 320
+   - [ ] RIPEMD 128 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd128.txt))
+   - [x] RIPEMD 160 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd160.txt))
+   - [ ] RIPEMD 256 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd256.txt))
+   - [ ] RIPEMD 320 ([SPEC](http://homes.esat.kuleuven.be/~bosselae/ripemd/rmd320.txt))
  * [x] SHA-1 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
  * [x] SHA-2 ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf))
    - [x] SHA-224
