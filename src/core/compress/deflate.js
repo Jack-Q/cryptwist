@@ -185,7 +185,6 @@ export class Deflate {
     const decompressBlock = {
       // no compress
       0: () => {
-        console.log('no compression');
         // skip current byte
         if (bitPtr > 0) { bitPtr = 0; bytePtr += 1; }
         const len = getDByte();
@@ -193,8 +192,6 @@ export class Deflate {
         if (len !== (0xffff ^ nLen)) {
           throw 'no compression block length mismatch';
         }
-        console.log('block length', len, nLen);
-        // console.log(msg.slice(bytePtr, bytePtr + len));
         yieldByteArray(msg, bytePtr, len);
         bytePtr += len;
       },
