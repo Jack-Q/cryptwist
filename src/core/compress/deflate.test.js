@@ -1,4 +1,4 @@
-import { Deflate } from './deflate';
+import { DeflateCompressor } from './deflate';
 import Encode from '../encode';
 
 const { decode } = Encode.Base64Encoder;
@@ -12,7 +12,7 @@ const tests = [
 
 tests.forEach((i) => {
   it('should inflate short chunk of messages', expect(
-    Array.from(Deflate.decompress(decode(i[0])))
+    Array.from(DeflateCompressor.decompress(decode(i[0])))
       .map(byte => String.fromCharCode(byte))
       .join(''),
   ).toEqual(i[1]));
