@@ -94,8 +94,20 @@ The core module contains implementation of various cryptographic primitives.
 
 ### Compression Algorithms
  * [ ] Zlib format ([RFC1950](https://tools.ietf.org/html/rfc1950))
- * [ ] DEFLATE format (ZIP format) ([RFC1951](https://tools.ietf.org/html/rfc1951))
- * [ ] BZip2 format ([RFC1952](https://tools.ietf.org/html/rfc1952))
+   - [ ] compress
+   - [x] decompress
+ * [ ] DEFLATE format ([RFC1951](https://tools.ietf.org/html/rfc1951))
+   - [ ] compress
+   - [x] decompress
+ * [ ] Gzip format ([RFC1952](https://tools.ietf.org/html/rfc1952))
+   - [ ] compress
+   - [x] decompress
+ * [ ] BZip2 format 
+   - [ ] compress
+   - [ ] decompress
+ * [ ] LZMA
+ * [ ] LZMA2
+ * [ ] lz4
 
 ### Key Derivation Function 
  * [ ] PBKDF1 (Password Based Key Derivation Function) ([RFC8018](https://tools.ietf.org/html/rfc8018))
