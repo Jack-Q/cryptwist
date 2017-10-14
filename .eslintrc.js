@@ -28,6 +28,7 @@ module.exports = {
     'no-mixed-operators': 0,
     'no-console': 0, 
     'no-bitwise': 0,
+    'no-plusplus': 0,
     'no-throw-literal': 0,
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
