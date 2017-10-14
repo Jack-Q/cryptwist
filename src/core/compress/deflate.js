@@ -22,7 +22,11 @@ export class Deflate {
     let bufferPos = 0;
 
     const expandBuffer = (len = 0) => {
-      const newBuffer = new Uint8Array(buffer.length + Math.max(len, 512, 2 * (msg.length - bytePtr)));
+      const newBuffer = new Uint8Array(buffer.length + Math.max(
+        len,
+        512,
+        2 * (msg.length - bytePtr),
+      ));
       newBuffer.set(buffer);
       buffer = newBuffer;
     };
@@ -186,10 +190,13 @@ export class Deflate {
         if (bitPtr > 0) { bitPtr = 0; bytePtr += 1; }
         const len = getDByte();
         const nLen = getDByte();
+        if (len !== (0xffff ^ nLen)) {
+          throw 'no compression block length mismatch';
+        }
         console.log('block length', len, nLen);
         // console.log(msg.slice(bytePtr, bytePtr + len));
+        yieldByteArray(msg, bytePtr, len);
         bytePtr += len;
-        throw 'no compression block';
       },
       // fixed Huffman codes
       1: ({ getLitLen, getDistanceCode } = {
