@@ -1,5 +1,6 @@
 // This script implements the DEFLATE algorithm
 import { reverseBits } from '../util';
+import { Deflate, DeflateOption } from './deflate-impl/deflate';
 
 export class DeflateCompressor {
 
@@ -241,8 +242,8 @@ export class DeflateCompressor {
     return buffer.slice(0, bufferPos);
   }
 
-  static compress(msg) {
-    return Uint8Array.from([1, 2, 3, 4]);
+  static compress(msg, opt = DeflateOption.defaultOption) {
+    return Deflate.compress(opt, msg);
   }
 }
 

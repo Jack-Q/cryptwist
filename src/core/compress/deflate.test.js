@@ -11,7 +11,7 @@ const tests = [
 ];
 
 tests.forEach((i) => {
-  it('should inflate short chunk of messages', expect(
+  it('should inflate short chunk of messages', () => expect(
     Array.from(DeflateCompressor.decompress(decode(i[0])))
       .map(byte => String.fromCharCode(byte))
       .join(''),
@@ -24,3 +24,18 @@ tests.forEach((i) => {
 // printHash(compressedFileBuffer);
 // const decompressedFileBuffer = Deflate.decompress(compressedFileBuffer.slice(2, -4));
 // printHash(decompressedFileBuffer);
+
+const compressTests = [
+  '111111111111',
+  // 'Hello World',
+  // 'message message message',
+];
+compressTests.forEach((i) => {
+  it('should compress a decompress-able package', () => {
+    const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
+    const comp = DeflateCompressor.compress(msg);
+    const deComp = DeflateCompressor.decompress(comp);
+    return expect(deComp).toEqual(msg);
+  });
+})
+;
