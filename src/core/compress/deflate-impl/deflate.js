@@ -118,36 +118,47 @@ class Block {
 
 /**
  * Straightforward Huffman scan to calculate character frequencies in message
+ * @argument {Deflate} ctx
+ * @argument {boolean} isEnd
  */
-const messageScanHuffman = () => {
+const messageScanHuffman = (ctx, isEnd) => {
 
 };
 
 /**
  * Message scan to apply run-length coding (RLC) to consecutive characters
+ * @argument {Deflate} ctx
+ * @argument {boolean} isEnd
  */
-const messageScanRunBytes = () => {
+const messageScanRunBytes = (ctx, isEnd) => {
 
 };
 
 /**
  * Message scan without compression, just copy message to output buffer
+ * @argument {Deflate} ctx
+ * @argument {boolean} isEnd
  */
-const messageScanCopy = () => {
-
+const messageScanCopy = (ctx, isEnd) => {
+  const { in: msg, out, blockBuf: block } = ctx;
+  ctx.ensureResult(msg.usePos - msg.curPos);
 };
 
 /**
  * Message scan with historic repetition matching and encoding (excluding lazy matching)
+ * @argument {Deflate} ctx
+ * @argument {boolean} isEnd
  */
-const messageScanMatch = () => {
+const messageScanMatch = (ctx, isEnd) => {
 
 };
 
 /**
  * Message scan with historic repetition matching and encoding, including lazy matching
+ * @argument {Deflate} ctx
+ * @argument {boolean} isEnd
  */
-const messageScanLazyMatch = () => {
+const messageScanLazyMatch = (ctx, isEnd) => {
 
 };
 
@@ -159,6 +170,16 @@ export class DeflateOption {
   static defaultOption = new DeflateOption();
 }
 
+// list of scan policy for raw message process
+// the first one is the default
+const scanAlgorithmList = {
+  copy: messageScanCopy,
+  huffman: messageScanHuffman,
+  runBytes: messageScanRunBytes,
+  match: messageScanMatch,
+  lazyMatch: messageScanLazyMatch,
+};
+
 export class Deflate {
   constructor(opt = {}) {
     this.opt = opt;
@@ -166,17 +187,59 @@ export class Deflate {
   }
 
   init() {
-    this.inBuf = new Uint8Array(1024);
-    this.outBuf = new Uint8Array(1024);
+    this.in = {
+      buf: new Uint8Array(1024),
+      readPos: 0, // current position of used message (out of the range of matching)
+      curPos: 0, // current processing position of scan algorithm
+      usePos: 0, // current occupied buffer
+    };
+    this.out = {
+      buf: new Uint8Array(1024),
+      pos: 0,
+    };
     this.blockBuf = new Block();
+    this.scanMessage = (scanAlgorithmList[this.opt.algorithm] || scanAlgorithmList[0]).bind(this, this);
   }
 
   endMessage(msg) {
-    this.inBuf.set(msg);
+    this.pushMessage(msg, true);
+  }
+
+  /**
+   *
+   * @param {Uint8Array} msg
+   * @param {boolean} isEnd
+   */
+  pushMessage(msg, isEnd = false) {
+    let left = msg.length;
+    while (left > 0) {
+      if (this.in.buf.length === this.in.usePos) {
+        // TODO: slide window
+        const len = this.in.readPos;
+        this.in.buf.set(this.in.buf.slice(len), 0);
+        this.in.readPos = 0;
+        this.in.curPos -= len;
+        this.in.usePos -= len;
+      }
+      if (left <= this.in.buf.length - this.in.usePos) {
+        // the last chunk of message
+        this.in.buf.set(msg.slice(-left), this.in.usePos);
+        this.in.usePos += left;
+        left = 0;
+        this.scanMessage(isEnd);
+        return;
+      }
+
+      const len = this.in.buf.length - this.in.usePos;
+      this.in.buf.set(msg.slice(-left, len - left));
+      this.in.usePos += len;
+      left -= len;
+      this.scanMessage(false);
+    }
   }
 
   get result() {
-    return this.outBuf;
+    return this.out.buf.slice(0, this.out.pos);
   }
 
   static compress(opt, msg) {
