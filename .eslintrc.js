@@ -26,10 +26,13 @@ module.exports = {
   // add your custom rules here
   'rules': {
     'no-mixed-operators': 0,
-    'no-console': 0, 
+    'no-console': 0,
     'no-bitwise': 0,
     'no-plusplus': 0,
     'no-throw-literal': 0,
+    'no-param-reassign': [2, {
+      "props": false
+    }],
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
       'js': 'never',

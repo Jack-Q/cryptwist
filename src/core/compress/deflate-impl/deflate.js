@@ -1,3 +1,68 @@
+class InputBuffer {
+  constructor() {
+    this.buf = new Uint8Array(1 << (10 + 6));
+    this.readPos = 0; // current position of used message (out of the range of matching)
+    this.curPos = 0; // current processing position of scan algorithm
+    this.usePos = 0; // current occupied buffer
+  }
+}
+
+class OutputBuffer {
+  constructor(size) {
+    this.buf = new Uint8Array(size);
+    this.bytePos = 0;
+    this.bitPos = 0;
+  }
+
+  ensureResult(len) {
+    if (this.buf.length - this.bytePos < len) {
+      const buf = new Uint8Array(this.buf.length + Math.max(len * 2, 1024 * 10));
+      buf.set(this.buf);
+      this.buf = buf;
+    }
+  }
+
+  putBits(bits, len) {
+    this.ensureResult(Math.ceil((len + 8 - this.bitPos) / 8));
+    let pos = 0;
+    // fill current unfilled byte
+    if (this.bitPos && this.bitPos + len > 8) {
+      this.buf[this.bytePos] &= 0xff << this.bitPos;
+      this.buf[this.bytePos] |= bits << this.bitPos;
+      pos += 8 - this.bitPos;
+      this.bitPos = 0;
+      this.bytePos++;
+    }
+    // copy whole bytes
+    while (len - pos > 8) {
+      this.putByte(bits >> pos);
+      pos += 8;
+    }
+    // fill tailing bits
+    if (pos < len && this.bitPos + len <= 8) {
+      this.buf[this.bytePos] &= 0xff << this.bitPos;
+      this.buf[this.bytePos] |= bits << this.bitPos;
+      this.bitPos += len;
+      if (this.bitPos === 8) {
+        this.bitPos = 0;
+        this.bytePos++;
+      }
+    }
+  }
+  putByte(byte) {
+    console.assert(this.bitPos === 0, 'bit pos of output buffer should be 0');
+    console.assert(this.bytePos < this.buf.length, 'buffer space should be ensured');
+    this.buf[this.bytePos++] = byte;
+  }
+  putBytes(buf, off = 0, len = buf.length - off) {
+    console.assert(this.bitPos === 0, 'bit pos of output buffer should be 0');
+    this.ensureResult(len);
+    this.buf.set(buf.slice(off, off + len), this.bytePos);
+    this.bytePos += len;
+  }
+}
+
+
 // convert real distance to internal code
 // Extra           Extra               Extra
 // Code Bits Dist  Code Bits   Dist     Code Bits Distance
@@ -88,8 +153,7 @@ const getLenCode = l => 257 + getLenCodeTable[l - 3];
 
 const BLOCK_TYPE = { OPTIMAL: -1, NO_COMPRESS: 0, STATIC_HUFF: 1, DYNAMIC_HUFF: 2 };
 class Block {
-  constructor(last, size = 1 << 6, type = BLOCK_TYPE.OPTIMAL) {
-    this.last = last;
+  constructor(size = 1 << 6, type = BLOCK_TYPE.OPTIMAL) {
     this.type = type;
     this.size = size;
     this.litBuf = new Uint8Array(size);
@@ -97,15 +161,18 @@ class Block {
     this.litLenFreq = Array(286).fill(0);
     this.disFreq = Array(32).fill(0);
     this.pos = 0;
+    this.msgSize = 0;
   }
   emitLiteral(lit) {
     this.litLenFreq[lit]++;
+    this.msgSize++;
     return this.emit(0, lit);
   }
 
   emitDist(dist, len) {
     this.disBuf[getDistCode(dist)]++;
     this.litLenFreq[getLenCode(len)]++;
+    this.msgSize += len;
     return this.emit(dist, len);
   }
   emit(dist, litLen) {
@@ -114,6 +181,38 @@ class Block {
     // TODO: block truncate check (whether to stop current block here is profitable)
     return ++this.pos === this.size;
   }
+  encodeBlock(out, msg, isEnd) {
+    let encoding = this.type;
+    if (encoding === BLOCK_TYPE.OPTIMAL) {
+      // TODO: select optimal coding
+      encoding = BLOCK_TYPE.NO_COMPRESS;
+    }
+    if (encoding === BLOCK_TYPE.NO_COMPRESS) {
+      this.encodeBlockPlain(out, msg, isEnd);
+    }
+  }
+  reset() {
+    this.litLenFreq.fill(0);
+    this.disFreq.fill(0);
+    this.pos = 0;
+    this.msgSize = 0;
+  }
+  /**
+   * @param {OutputBuffer} out
+   * @param {InputBuffer} msg
+   * @param {boolean} isEnd
+   */
+  encodeBlockPlain(out, msg, isEnd) {
+    out.ensureResult(this.msgSize + 4 + 2);
+    out.putBits(0b000 | (isEnd ? 1 : 0), 3);
+    if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
+    const len = this.msgSize;
+    out.putByte(len); out.putByte(len >>> 8); // length
+    out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
+    out.putBytes(msg.buf, msg.curPos - len, len);
+    this.reset();
+  }
+  get full() { return this.pos === this.size; }
 }
 
 /**
@@ -123,6 +222,17 @@ class Block {
  */
 const messageScanHuffman = (ctx, isEnd) => {
   const { in: msg, out, blockBuf: block } = ctx;
+  while (msg.curPos < msg.usePos) {
+    while (msg.curPos < msg.usePos && !block.emitLiteral(msg.buf[msg.curPos++]));
+    if (block.full) {
+      block.encodeBlock(out, msg, msg.curPos === msg.usePos ? isEnd : false);
+      msg.readPos = msg.curPos;
+    }
+    if (msg.curPos === msg.usePos && isEnd) {
+      block.encodeBlock(out, msg, true);
+      msg.readPos = msg.curPos;
+    }
+  }
 };
 
 /**
@@ -148,7 +258,6 @@ const messageScanCopy = (ctx, isEnd) => {
   // the length of msg can always satisfied to the constraint of block length
   if (isEnd || msg.usePos - msg.curPos >= msg.buf.length / 2) {
     out.putBits(0b000 | (isEnd ? 1 : 0), 3);
-    console.log(out.bitPos);
     if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
 
     const len = msg.usePos - msg.curPos;
@@ -204,61 +313,10 @@ export class Deflate {
   }
 
   init() {
-    this.in = {
-      buf: new Uint8Array(1 << (10 + 6)),
-      readPos: 0, // current position of used message (out of the range of matching)
-      curPos: 0, // current processing position of scan algorithm
-      usePos: 0, // current occupied buffer
-    };
-    this.out = {
-      buf: new Uint8Array(1 << (10 + 6)),
-      bytePos: 0,
-      bitPos: 0,
-
-      ensureResult: (len) => {
-        if (this.out.buf.length - this.out.bytePos < len) {
-          const buf = new Uint8Array(this.out.buf.length + Math.max(len * 2, 1024 * 10));
-          buf.set(this.out.buf);
-          this.out.buf = buf;
-        }
-      },
-      putBits: (bits, len) => {
-        this.out.ensureResult(Math.ceil((len + 8 - this.out.bitPos) / 8));
-        let pos = 0;
-        // fill current unfilled byte
-        if (this.out.bitPos && this.out.bitPos + len > 8) {
-          this.out.buf[this.out.bytePos] &= 0xff << this.out.bitPos;
-          this.out.buf[this.out.bytePos] |= bits << this.out.bitPos;
-          pos += 8 - this.out.bitPos;
-          this.out.bitPos = 0;
-          this.out.bytePos++;
-        }
-        // copy whole bytes
-        while (len - pos > 8) {
-          this.out.putByte(bits >> pos);
-          pos += 8;
-        }
-        // fill tailing bits
-        if (pos < len && this.out.bitPos + len <= 8) {
-          this.out.buf[this.out.bytePos] &= 0xff << this.out.bitPos;
-          this.out.buf[this.out.bytePos] |= bits << this.out.bitPos;
-          this.out.bitPos += len;
-          if (this.out.bitPos === 8) {
-            this.out.bitPos = 0;
-            this.out.bytePos++;
-          }
-        }
-      },
-      // bit pos of output buffer should be 0, buffer space should be ensured
-      putByte: (byte) => { this.out.buf[this.out.bytePos++] = byte; },
-      // bit pos of output buffer should be 0
-      putBytes: (buf, off = 0, len = buf.length - off) => {
-        this.out.ensureResult(len);
-        this.out.buf.set(buf.slice(off, off + len), this.out.bytePos);
-        this.out.bytePos += len;
-      },
-    };
-    this.blockBuf = new Block();
+    const bufferSize = 1 << (10 + 5);
+    this.in = new InputBuffer(bufferSize << 1);
+    this.out = new OutputBuffer(bufferSize << 1);
+    this.blockBuf = new Block(bufferSize);
     this.scanMessage = (
       scanAlgorithmList[this.opt.algorithm] ||
       scanAlgorithmList[Object.keys(scanAlgorithmList)[0]]
