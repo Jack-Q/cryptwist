@@ -187,8 +187,18 @@ class Block {
       // TODO: select optimal coding
       encoding = BLOCK_TYPE.NO_COMPRESS;
     }
-    if (encoding === BLOCK_TYPE.NO_COMPRESS) {
-      this.encodeBlockPlain(out, msg, isEnd);
+    switch (encoding) {
+      case BLOCK_TYPE.NO_COMPRESS:
+        this.encodeBlockPlain(out, msg, isEnd);
+        break;
+      case BLOCK_TYPE.STATIC_HUFF:
+        this.encodingBlockStaticHuffman(out, msg, isEnd);
+        break;
+      case BLOCK_TYPE.DYNAMIC_HUFF:
+        this.encodingBlockDynamicHuffman(out, msg, isEnd);
+        break;
+      default:
+        this.encodeBlockPlain(out, msg, isEnd);
     }
   }
   reset() {
@@ -212,6 +222,25 @@ class Block {
     out.putBytes(msg.buf, msg.curPos - len, len);
     this.reset();
   }
+
+  /**
+   * @param {OutputBuffer} out
+   * @param {InputBuffer} msg
+   * @param {boolean} isEnd
+   */
+  encodingBlockStaticHuffman(out, msg, isEnd) {
+    this.reset();
+  }
+
+  /**
+   * @param {OutputBuffer} out
+   * @param {InputBuffer} msg
+   * @param {boolean} isEnd
+   */
+  encodingBlockDynamicHuffman(out, msg, isEnd) {
+    this.reset();
+  }
+
   get full() { return this.pos === this.size; }
 }
 
@@ -306,6 +335,13 @@ const scanAlgorithmList = {
   lazyMatch: messageScanLazyMatch,
 };
 
+const encodeBlockMode = {
+  optimal: BLOCK_TYPE.OPTIMAL,
+  forceNoCompress: BLOCK_TYPE.NO_COMPRESS,
+  forceStaticHuff: BLOCK_TYPE.STATIC_HUFF,
+  forceDynamicHuff: BLOCK_TYPE.DYNAMIC_HUFF,
+};
+
 export class Deflate {
   constructor(opt = {}) {
     this.opt = opt;
@@ -316,7 +352,9 @@ export class Deflate {
     const bufferSize = 1 << (10 + 5);
     this.in = new InputBuffer(bufferSize << 1);
     this.out = new OutputBuffer(bufferSize << 1);
-    this.blockBuf = new Block(bufferSize);
+    this.encodeBlockMode =
+      encodeBlockMode[this.opt.encode] || BLOCK_TYPE.OPTIMAL;
+    this.blockBuf = new Block(bufferSize, this.encodeBlockMode);
     this.scanMessage = (
       scanAlgorithmList[this.opt.algorithm] ||
       scanAlgorithmList[Object.keys(scanAlgorithmList)[0]]

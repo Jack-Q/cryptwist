@@ -43,5 +43,11 @@ compressTests.forEach((i) => {
     const deComp = DeflateCompressor.decompress(comp);
     return expect(deComp).toEqual(msg);
   });
+  it('should compress a decompress-able package in Huffman mode', () => {
+    const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
+    const comp = DeflateCompressor.compress(msg, { algorithm: 'huffman', encode: 'forceStaticHuff' });
+    const deComp = DeflateCompressor.decompress(comp);
+    return expect(deComp).toEqual(msg);
+  });
 })
 ;
