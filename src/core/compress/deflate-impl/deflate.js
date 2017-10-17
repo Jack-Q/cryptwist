@@ -122,7 +122,7 @@ class Block {
  * @argument {boolean} isEnd
  */
 const messageScanHuffman = (ctx, isEnd) => {
-
+  const { in: msg, out, blockBuf: block } = ctx;
 };
 
 /**
@@ -136,12 +136,29 @@ const messageScanRunBytes = (ctx, isEnd) => {
 
 /**
  * Message scan without compression, just copy message to output buffer
+ *
+ * In this mode, the block buffer is always not used (no hash table is maintained)
  * @argument {Deflate} ctx
  * @argument {boolean} isEnd
  */
 const messageScanCopy = (ctx, isEnd) => {
-  const { in: msg, out, blockBuf: block } = ctx;
-  ctx.ensureResult(msg.usePos - msg.curPos);
+  const { in: msg, out } = ctx;
+  out.ensureResult(msg.usePos - msg.curPos + 6);
+  // since message is copied into ``in'' buffer first,
+  // the length of msg can always satisfied to the constraint of block length
+  if (isEnd || msg.usePos - msg.curPos >= msg.buf.length / 2) {
+    out.putBits(0b000 | (isEnd ? 1 : 0), 3);
+    console.log(out.bitPos);
+    if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
+
+    const len = msg.usePos - msg.curPos;
+    out.putByte(len); out.putByte(len >>> 8); // length
+    out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
+    out.putBytes(msg.buf, msg.curPos, len);
+
+    msg.curPos = msg.usePos;
+    msg.readPos = msg.usePos;
+  }
 };
 
 /**
@@ -188,17 +205,64 @@ export class Deflate {
 
   init() {
     this.in = {
-      buf: new Uint8Array(1024),
+      buf: new Uint8Array(1 << (10 + 6)),
       readPos: 0, // current position of used message (out of the range of matching)
       curPos: 0, // current processing position of scan algorithm
       usePos: 0, // current occupied buffer
     };
     this.out = {
-      buf: new Uint8Array(1024),
-      pos: 0,
+      buf: new Uint8Array(1 << (10 + 6)),
+      bytePos: 0,
+      bitPos: 0,
+
+      ensureResult: (len) => {
+        if (this.out.buf.length - this.out.bytePos < len) {
+          const buf = new Uint8Array(this.out.buf.length + Math.max(len * 2, 1024 * 10));
+          buf.set(this.out.buf);
+          this.out.buf = buf;
+        }
+      },
+      putBits: (bits, len) => {
+        this.out.ensureResult(Math.ceil((len + 8 - this.out.bitPos) / 8));
+        let pos = 0;
+        // fill current unfilled byte
+        if (this.out.bitPos && this.out.bitPos + len > 8) {
+          this.out.buf[this.out.bytePos] &= 0xff << this.out.bitPos;
+          this.out.buf[this.out.bytePos] |= bits << this.out.bitPos;
+          pos += 8 - this.out.bitPos;
+          this.out.bitPos = 0;
+          this.out.bytePos++;
+        }
+        // copy whole bytes
+        while (len - pos > 8) {
+          this.out.putByte(bits >> pos);
+          pos += 8;
+        }
+        // fill tailing bits
+        if (pos < len && this.out.bitPos + len <= 8) {
+          this.out.buf[this.out.bytePos] &= 0xff << this.out.bitPos;
+          this.out.buf[this.out.bytePos] |= bits << this.out.bitPos;
+          this.out.bitPos += len;
+          if (this.out.bitPos === 8) {
+            this.out.bitPos = 0;
+            this.out.bytePos++;
+          }
+        }
+      },
+      // bit pos of output buffer should be 0, buffer space should be ensured
+      putByte: (byte) => { this.out.buf[this.out.bytePos++] = byte; },
+      // bit pos of output buffer should be 0
+      putBytes: (buf, off = 0, len = buf.length - off) => {
+        this.out.ensureResult(len);
+        this.out.buf.set(buf.slice(off, off + len), this.out.bytePos);
+        this.out.bytePos += len;
+      },
     };
     this.blockBuf = new Block();
-    this.scanMessage = (scanAlgorithmList[this.opt.algorithm] || scanAlgorithmList[0]).bind(this, this);
+    this.scanMessage = (
+      scanAlgorithmList[this.opt.algorithm] ||
+      scanAlgorithmList[Object.keys(scanAlgorithmList)[0]]
+    ).bind(this, this);
   }
 
   endMessage(msg) {
@@ -239,13 +303,15 @@ export class Deflate {
   }
 
   get result() {
-    return this.out.buf.slice(0, this.out.pos);
+    return this.out.buf.slice(0, this.out.bytePos);
   }
 
   static compress(opt, msg) {
     const s = new Deflate(opt);
     s.endMessage(msg);
-    return s.result;
+    const result = s.result;
+    console.log(result);
+    return result;
   }
 }
 
