@@ -56,7 +56,13 @@ The core module contains implementation of various cryptographic primitives.
    - [x] SHAKE-256 XOF
 
 ### Message Authentication Codes 
- * [ ] HMAC (Keyed-Hashing for Message Authentication) ([RFC2104](https://tools.ietf.org/html/rfc2104))
+ * [x] HMAC (Keyed-Hashing for Message Authentication) ([RFC2104](https://tools.ietf.org/html/rfc2104))
+  - [x] HMAC-MD5 ([RFC2202](https://tools.ietf.org/html/rfc2202))
+  - [x] HMAC-SHA-1 ([RFC2202](https://tools.ietf.org/html/rfc2202))
+  - [x] HMAC-SHA-224 ([RFC4231](https://tools.ietf.org/html/rfc4231))
+  - [x] HMAC-SHA-256 ([RFC4231](https://tools.ietf.org/html/rfc4231))
+  - [x] HMAC-SHA-384 ([RFC4231](https://tools.ietf.org/html/rfc4231))
+  - [x] HMAC-SHA-512 ([RFC4231](https://tools.ietf.org/html/rfc4231))
 
 ### Pseudo-Random Number Generators / Stream Ciphers
  * [x] RC4
