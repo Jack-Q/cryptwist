@@ -1,4 +1,4 @@
-import { HmacMD5 } from './hmac-md5';
+import { HmacSHA1 } from './hmac-sha-1';
 import Encoder from '../encode';
 
 const { decode, encode } = Encoder.HexEncoder;
@@ -10,43 +10,43 @@ const { decode: fromStr } = Encoder.AsciiEncoder;
 
 const tests = [
   {
-    key: decode('0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b'),
+    key: decode('0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b'),
     msg: fromStr('Hi There'),
-    mac: '9294727a3638bb1c13f48ef8158bfc9d',
+    mac: 'b617318655057264e28bc0b6fb378c8ef146be00',
   },
   {
     key: fromStr('Jefe'),
     msg: fromStr('what do ya want for nothing?'),
-    mac: '750c783e6ab0b503eaa86e310a5db738',
+    mac: 'effcdf6ae5eb2fa2d27416d5f184df9c259a7c79',
   },
   {
-    key: decode('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
+    key: decode('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
     msg: new Uint8Array(50).fill(0xdd),
-    mac: '56be34521d144c88dbb8c733f0e8b3f6',
+    mac: '125d7342b9ac11cd91a39af48aa17b4f63f175d3',
   },
   {
     key: decode('0102030405060708090a0b0c0d0e0f10111213141516171819'),
     msg: new Uint8Array(50).fill(0xcd),
-    mac: '697eaf0aca3a3aea3a75164746ffaa79',
+    mac: '4c9007f4026250c6bc8414f9bf50c86c2d7235da',
   },
   {
-    key: decode('0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c'),
+    key: decode('0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c'),
     msg: fromStr('Test With Truncation'),
-    mac: '56461ef2342edc00f9bab995690efd4c',
+    mac: '4c1a03424b55e07fe7f27be1d58bb9324a9a5a04',
   },
   {
     key: new Uint8Array(80).fill(0xaa),
     msg: fromStr('Test Using Larger Than Block-Size Key - Hash Key First'),
-    mac: '6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd',
+    mac: 'aa4ae5e15272d00e95705637ce8a3b55ed402112',
   },
   {
     key: new Uint8Array(80).fill(0xaa),
     msg: fromStr('Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data'),
-    mac: '6f630fad67cda0ee1fb1f562db3aa53e',
+    mac: 'e8e99d0f45237d786d6bbaa7965c7808bbff1a91',
   },
 ];
 
 tests.forEach((t) => {
   it('should generate correct MAC', () =>
-    expect(encode(new HmacMD5(t.key).hash(t.msg))).toEqual(t.mac));
+    expect(encode(new HmacSHA1(t.key).hash(t.msg))).toEqual(t.mac));
 });

@@ -15,7 +15,9 @@ export class Hmac extends Hash {
       this.padKey = new Uint8Array(this.blockLength).fill(0);
       this.padKey.set(this.key);
     } else {
-      this.padKey = hashInst.hash(this.key);
+      const hashKey = hashInst.hash(this.key);
+      this.padKey = new Uint8Array(this.blockLength).fill(0);
+      this.padKey.set(hashKey);
     }
     this.clean = true;
   }
