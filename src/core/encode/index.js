@@ -4,11 +4,14 @@ import Base16Encoder from './base16';
 import Base85Encoder from './base85';
 import HexEncoder from './hex';
 import AsciiArmoredEncoder from './ascii-armored';
+import AsciiEncoder from './ascii';
 
 const encoders = [
   Base16Encoder, Base32Encoder,
   Base64Encoder, Base85Encoder,
-  AsciiArmoredEncoder, HexEncoder];
+  AsciiArmoredEncoder, HexEncoder,
+  AsciiEncoder,
+];
 
 const Encoder = {
   Base64Encoder,
@@ -17,6 +20,7 @@ const Encoder = {
   Base85Encoder,
   HexEncoder,
   AsciiArmoredEncoder,
+  AsciiEncoder,
   encoders,
 
   getEncoder(name) {
