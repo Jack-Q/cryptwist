@@ -191,6 +191,112 @@ const getStaticHuffLitLenBit = (code) => {
   return [0, 0];
 };
 
+const constHuffmanTree = (nodes) => {
+  const tree = Array.from(nodes.filter(e => e.freq > 0));
+  if (tree.length === 0) return 0;
+  const maxLit = tree[tree.length - 1].lit + 1;
+  // construct tree
+  while (tree.length > 1) {
+    tree.sort((i, j) => i.freq - j.freq);
+    const a = tree.shift();
+    const b = tree.shift();
+    tree.push({ freq: a.freq + b.freq, a, b });
+  }
+  // traverse tree
+  const count = [];
+  let max = -Infinity;
+  let min = Infinity;
+  const tr = (t, l) => {
+    if (t.lit === undefined) {
+      tr(t.a, l + 1);
+      tr(t.b, l + 1);
+    } else {
+      t.len = l;
+      count[l] = (count[l] || 0) + 1;
+      max = Math.max(max, l);
+      min = Math.min(min, l);
+    }
+  };
+  tr(tree[0], 0);
+
+  const nxtBit = [];
+  for (let i = min, c = 0; i <= max; i++) {
+    c = (c + (count[i - 1] || 0)) << 1;
+    nxtBit[i] = c;
+  }
+
+  for (let i = 0; i < nodes.length; i++) {
+    if (nodes[i].freq > 0) {
+      nodes[i].code = nxtBit[nodes[i].len]++;
+    }
+  }
+  return maxLit;
+};
+
+const encodeCodeLengthDictOrder = [
+  3, 17, 15, 13, 11, 9, 7, 5,
+  4, 6, 8, 10, 12, 14, 16, 18,
+  0, 1, 2,
+];
+
+/**
+ * Encode literal-length dictionary and distance dictionary
+ *
+ * 0 - 15: Represent code lengths of 0 - 15
+ *  16: Copy the previous code length 3 - 6 times.
+ *      The next 2 bits indicate repeat length
+ *            (0 = 3, ... , 3 = 6)
+ *         Example:  Codes 8, 16 (+2 bits 11),
+ *                   16 (+2 bits 10) will expand to
+ *                   12 code lengths of 8 (1 + 6 + 5)
+ *  17: Repeat a code length of 0 for 3 - 10 times.
+ *      (3 bits of length)
+ *  18: Repeat a code length of 0 for 11 - 138 times
+ *      (7 bits of length)
+ *
+ * Code length alphabet in order
+ *  16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+ *
+ * @param {Array<{len: number}>} nodes
+ */
+const encodeCodeLength = (nodes) => {
+  const litLenDisDict = [];
+  const codeFreq = Array(encodeCodeLengthDictOrder.length).fill(0);
+  const freq = f => codeFreq[f]++;
+  const len = i => (nodes[i] ? nodes[i].len || 0 : -1);
+  for (let i = 0; i < nodes.length; i++) {
+    if (len(i) > 0) {
+      const v = len(i);
+      console.assert(v > 0 && v <= 15, `${v}should in (0, 15]`);
+      litLenDisDict.push(v);
+      freq(v);
+      // repeat for 3 or longer times
+      if (len(i + 1) === v && len(i + 2) === v && len(i + 3) === v) {
+        let r = 3;
+        while (len(i + r + 1) === v) r++;
+        let l = r;
+        while (l > 6) { litLenDisDict.push(16, [2, 0b11]); freq(16); l -= 6; }
+        if (l > 3) { litLenDisDict.push(16, [2, l - 3]); freq(16); l = 0; }
+        i += r - l - 1; // balance i++
+      }
+    } else {
+      let r = 0;
+      while (len(i + r) === 0) r++;
+      let l = r;
+      while (l >= 138) { litLenDisDict.push(18, [7, 138 - 11]); freq(18); l -= 138; }
+      if (l >= 11) { litLenDisDict.push(18, [7, l - 11]); freq(18); l = 0; }
+      if (l >= 3) { litLenDisDict.push(17, [3, l - 3]); freq(17); l = 0; }
+      while (l-- > 0) { litLenDisDict.push(0); freq(0); }
+      i += r - 1; // balance i++
+    }
+  }
+
+  const codeHuffmanCode = codeFreq.map((f, i) => ({ lit: encodeCodeLengthDictOrder[i], freq: f }));
+  const codeSize = constHuffmanTree(codeHuffmanCode);
+  const codeCost = codeSize * 3 + litLenDisDict.reduce((c, v) =>
+    c + (v.length ? v[1] : codeHuffmanCode[v].len), 0);
+  return { codeSize, codeCost, codeHuffmanCode, litLenDisDict };
+};
 
 const BLOCK_TYPE = { OPTIMAL: -1, NO_COMPRESS: 0, STATIC_HUFF: 1, DYNAMIC_HUFF: 2 };
 class Block {
@@ -222,6 +328,35 @@ class Block {
     // TODO: block truncate check (whether to stop current block here is profitable)
     return ++this.pos === this.size;
   }
+
+  dynamicHuffmanEncode() {
+    if (this.dynamicHuffmanEncodeStatus) return;
+    const litLenNodes = this.litLenFreq.map((i, n) => ({ lit: n, freq: i, len: 0 }));
+    const litLenSize = constHuffmanTree(litLenNodes);
+    const disNodes = this.disFreq.map((i, n) => ({ lit: n, freq: i, len: 0 }));
+    const disSize = constHuffmanTree(disNodes);
+    console.log(litLenNodes, disNodes);
+    const { codeSize, codeCost, codeHuffmanCode, litLenDisDict } = encodeCodeLength([
+      ...litLenNodes.slice(0, litLenSize),
+      ...disNodes.slice(0, disSize),
+    ]);
+    const cost = Math.ceil((this.disFreq.reduce((c, f, i) =>
+        c + f * (disNodes[i].len + getDistExtraBit(i).len), 0) +
+      this.litLenFreq.reduce((c, f, i) =>
+        c + f * (litLenNodes[i].len + (isLenCode(i) ? getLenExtraBit(i).len : 0)), 0) +
+      codeCost + 5 /* litSize */ + 5  /* distSize */ + 4 /* codeSize */ + 3 /* block header */ + 7 /* incomplete byte overhead */) / 8);
+    this.dynamicHuffmanEncodeStatus = {
+      cost,
+      codeSize,
+      litLenSize,
+      disSize,
+      codeHuffmanCode,
+      litLenDisDict,
+      litLenNodes,
+      disNodes,
+    };
+  }
+
   encodeBlock(out, msg, isEnd) {
     // put end of block literal to freq stat
     this.litLenFreq[256]++;
@@ -239,11 +374,13 @@ class Block {
         this.encodingBlockStaticHuffman(out, msg, isEnd);
         break;
       case BLOCK_TYPE.DYNAMIC_HUFF:
+        this.dynamicHuffmanEncode();
         this.encodingBlockDynamicHuffman(out, msg, isEnd);
         break;
       default:
         this.encodeBlockPlain(out, msg, isEnd);
     }
+    this.dynamicHuffmanEncodeStatus = null;
   }
   reset() {
     this.litLenFreq.fill(0);
@@ -273,7 +410,7 @@ class Block {
     this.reset();
   }
 
-  costBundStaticHuff() {
+  costBoundStaticHuff() {
     return Math.ceil((this.disFreq.reduce((cost, freq, index) =>
       cost + freq * (5 + getDistExtraBit(index).len), 0) +
       this.litLenFreq.reduce((cost, freq, index) =>
@@ -288,7 +425,7 @@ class Block {
    * @param {boolean} isEnd
    */
   encodingBlockStaticHuffman(out, msg, isEnd) {
-    out.ensureResult(this.costBundStaticHuff());
+    out.ensureResult(this.costBoundStaticHuff());
     out.putBits(0b010 | (isEnd ? 1 : 0), 3);
     for (let i = 0; i < this.pos; i++) {
       if (this.disBuf[i] > 0) {
@@ -316,7 +453,8 @@ class Block {
   }
 
   costBoundDynamicHuff() {
-    return -1;
+    this.dynamicHuffmanEncode();
+    return this.dynamicHuffmanEncodeStatus.cost;
   }
 
   /**
