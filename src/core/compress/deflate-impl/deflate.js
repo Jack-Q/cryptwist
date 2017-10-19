@@ -1,3 +1,5 @@
+import { reverseBits } from '../../util';
+
 class InputBuffer {
   constructor() {
     this.buf = new Uint8Array(1 << (10 + 6));
@@ -22,12 +24,16 @@ class OutputBuffer {
     }
   }
 
+  putRBits(bits, len) {
+    this.putBits(reverseBits(bits, len), len);
+  }
+
   putBits(bits, len) {
     this.ensureResult(Math.ceil((len + 8 - this.bitPos) / 8));
     let pos = 0;
     // fill current unfilled byte
     if (this.bitPos && this.bitPos + len > 8) {
-      this.buf[this.bytePos] &= 0xff << this.bitPos;
+      this.buf[this.bytePos] &= ~(0xff << this.bitPos);
       this.buf[this.bytePos] |= bits << this.bitPos;
       pos += 8 - this.bitPos;
       this.bitPos = 0;
@@ -39,10 +45,10 @@ class OutputBuffer {
       pos += 8;
     }
     // fill tailing bits
-    if (pos < len && this.bitPos + len <= 8) {
-      this.buf[this.bytePos] &= 0xff << this.bitPos;
-      this.buf[this.bytePos] |= bits << this.bitPos;
-      this.bitPos += len;
+    if (pos < len && this.bitPos + len - pos <= 8) {
+      this.buf[this.bytePos] &= ~(0xff << this.bitPos);
+      this.buf[this.bytePos] |= (bits >> pos) << this.bitPos;
+      this.bitPos += len - pos;
       if (this.bitPos === 8) {
         this.bitPos = 0;
         this.bytePos++;
@@ -114,6 +120,16 @@ const getDistCodeTable = [
 const getDistCode = i => getDistCodeTable[
   i < 256 ? (i - 1) : ((i - 1) >>> 7) + 256
 ];
+const getDistExtraBitTable = [
+  [1, 0], [2, 0], [3, 0], [4, 0], [5, 1],
+  [7, 1], [9, 2], [13, 2], [17, 3], [25, 3],
+  [33, 4], [49, 4], [65, 5], [97, 5], [129, 6],
+  [193, 6], [257, 7], [385, 7], [513, 8], [769, 8],
+  [1025, 9], [1537, 9], [2049, 10], [3073, 10], [4097, 11],
+  [6145, 11], [8193, 12], [12289, 12], [16385, 13], [24577, 13],
+  [0, 0], [0, 0], // the last two dist-code is not used
+].map(i => ({ len: i[1], base: i[0] }));
+const getDistExtraBit = code => getDistExtraBitTable[code];
 
 // convert real length to internal code
 // Extra               Extra               Extra
@@ -149,7 +165,32 @@ const getLenCodeTable = [
   27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 28,
   /* 258 => 257 + 28 = 285 */
 ];
+const isLenCode = code => code >= 257 && code <= 285;
 const getLenCode = l => 257 + getLenCodeTable[l - 3];
+const getLenExtraBitTable = [
+  [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
+  [8, 0], [9, 0], [10, 0], [11, 1], [13, 1],
+  [15, 1], [17, 1], [19, 2], [23, 2], [27, 2],
+  [31, 2], [35, 3], [43, 3], [51, 3], [59, 3],
+  [67, 4], [83, 4], [99, 4], [115, 4], [131, 5],
+  [163, 5], [195, 5], [227, 5], [258, 0],
+].map(i => ({ len: i[1], base: i[0] }));
+const getLenExtraBit = lenCode => getLenExtraBitTable[lenCode - 257];
+
+// Lit Value    Bits    Codes
+// ---------    ----    -----
+//   0 - 143     8      00110000  through 10111111
+// 144 - 255     9      110010000 through 111111111
+// 256 - 279     7      0000000   through 0010111
+// 280 - 287     8      11000000  through 11000111
+const getStaticHuffLitLenBit = (code) => {
+  if (code >= 256 && code <= 279) return [code - 256, 7];
+  if (code <= 143 && code >= 0) return [0b00110000 + code, 8];
+  if (code >= 280 && code <= 277) return [0b11000000 + code - 280, 9];
+  if (code >= 144 && code <= 255) return [0b110010000 + code - 144, 9];
+  return [0, 0];
+};
+
 
 const BLOCK_TYPE = { OPTIMAL: -1, NO_COMPRESS: 0, STATIC_HUFF: 1, DYNAMIC_HUFF: 2 };
 class Block {
@@ -176,12 +217,15 @@ class Block {
     return this.emit(dist, len);
   }
   emit(dist, litLen) {
-    this.litBuf[this.pos] = dist;
-    this.disBuf[this.pos] = litLen;
+    this.litBuf[this.pos] = litLen;
+    this.disBuf[this.pos] = dist;
     // TODO: block truncate check (whether to stop current block here is profitable)
     return ++this.pos === this.size;
   }
   encodeBlock(out, msg, isEnd) {
+    // put end of block literal to freq stat
+    this.litLenFreq[256]++;
+
     let encoding = this.type;
     if (encoding === BLOCK_TYPE.OPTIMAL) {
       // TODO: select optimal coding
@@ -207,13 +251,19 @@ class Block {
     this.pos = 0;
     this.msgSize = 0;
   }
+
+  /**
+   * calculate cost to encode message block in plain message
+   */
+  costBoundBlockPlain() { return this.message + 4 + 2; }
+
   /**
    * @param {OutputBuffer} out
    * @param {InputBuffer} msg
    * @param {boolean} isEnd
    */
   encodeBlockPlain(out, msg, isEnd) {
-    out.ensureResult(this.msgSize + 4 + 2);
+    out.ensureResult(this.costBoundBlockPlain());
     out.putBits(0b000 | (isEnd ? 1 : 0), 3);
     if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
     const len = this.msgSize;
@@ -223,13 +273,50 @@ class Block {
     this.reset();
   }
 
+  costBundStaticHuff() {
+    return Math.ceil((this.disFreq.reduce((cost, freq, index) =>
+      cost + freq * (5 + getDistExtraBit(index).len), 0) +
+      this.litLenFreq.reduce((cost, freq, index) =>
+        cost + freq * (getStaticHuffLitLenBit(index)[1] +
+          (isLenCode(index) ? getLenExtraBit(index).len : 0))
+        , 0) + 3 /* block header */ + 7 /* incomplete byte overhead */) / 8);
+  }
+
   /**
    * @param {OutputBuffer} out
    * @param {InputBuffer} msg
    * @param {boolean} isEnd
    */
   encodingBlockStaticHuffman(out, msg, isEnd) {
+    out.ensureResult(this.costBundStaticHuff());
+    out.putBits(0b010 | (isEnd ? 1 : 0), 3);
+    for (let i = 0; i < this.pos; i++) {
+      if (this.disBuf[i] > 0) {
+        // len
+        const len = this.litBuf[i];
+        const lenCode = getLenCode(len);
+        out.putRBits(...getStaticHuffLitLenBit(lenCode));
+        const lenExtra = getLenExtraBit(lenCode);
+        if (lenExtra.len > 0) {
+          out.putRBits(len - lenExtra.base, lenExtra.len);
+        }
+        // dist
+        const dist = this.disBuf[i];
+        const distCode = getDistCode(dist);
+        out.putRBits(distCode, 5); // fixed for static huffman
+        const distExtra = getDistExtraBit(distCode);
+        out.putRBits(dist - distExtra.base, distExtra.len);
+      } else {
+        // literal
+        out.putRBits(...getStaticHuffLitLenBit(this.litBuf[i]));
+      }
+    }
+    out.putRBits(...getStaticHuffLitLenBit(256));
     this.reset();
+  }
+
+  costBoundDynamicHuff() {
+    return -1;
   }
 
   /**
