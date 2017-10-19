@@ -233,10 +233,16 @@ const constHuffmanTree = (nodes) => {
   return maxLit;
 };
 
-const encodeCodeLengthDictOrder = [
+const encodeCodeLengthDictInvOrder = [
   3, 17, 15, 13, 11, 9, 7, 5,
   4, 6, 8, 10, 12, 14, 16, 18,
   0, 1, 2,
+];
+const encodeCodeLengthDictOrder = [
+  16, 17, 18, 0, 8, 7,
+  9, 6, 10, 5, 11, 4,
+  12, 3, 13, 2, 14, 1,
+  15,
 ];
 
 /**
@@ -261,7 +267,7 @@ const encodeCodeLengthDictOrder = [
  */
 const encodeCodeLength = (nodes) => {
   const litLenDisDict = [];
-  const codeFreq = Array(encodeCodeLengthDictOrder.length).fill(0);
+  const codeFreq = Array(encodeCodeLengthDictInvOrder.length).fill(0);
   const freq = f => codeFreq[f]++;
   const len = i => (nodes[i] ? nodes[i].len || 0 : -1);
   for (let i = 0; i < nodes.length; i++) {
@@ -291,8 +297,8 @@ const encodeCodeLength = (nodes) => {
     }
   }
 
-  const codeHuffmanCode = codeFreq.map((f, i) => ({ lit: encodeCodeLengthDictOrder[i], freq: f }));
-  const codeSize = constHuffmanTree(codeHuffmanCode);
+  const codeHuffmanCode = codeFreq.map((f, i) => ({ lit: i, freq: f, len: 0 }));
+  const codeSize = constHuffmanTree(Array.from(codeHuffmanCode).sort((i, j) => i.lit - j.lit));
   const codeCost = codeSize * 3 + litLenDisDict.reduce((c, v) =>
     c + (v.length ? v[1] : codeHuffmanCode[v].len), 0);
   return { codeSize, codeCost, codeHuffmanCode, litLenDisDict };
@@ -338,7 +344,7 @@ class Block {
     console.log(litLenNodes, disNodes);
     const { codeSize, codeCost, codeHuffmanCode, litLenDisDict } = encodeCodeLength([
       ...litLenNodes.slice(0, litLenSize),
-      ...disNodes.slice(0, disSize),
+      ...(disSize === 0 ? [1] : disNodes.slice(0, disSize)),
     ]);
     const cost = Math.ceil((this.disFreq.reduce((c, f, i) =>
         c + f * (disNodes[i].len + getDistExtraBit(i).len), 0) +
@@ -349,7 +355,7 @@ class Block {
       cost,
       codeSize,
       litLenSize,
-      disSize,
+      disSize: disSize === 0 ? 1 : disSize,
       codeHuffmanCode,
       litLenDisDict,
       litLenNodes,
@@ -380,13 +386,13 @@ class Block {
       default:
         this.encodeBlockPlain(out, msg, isEnd);
     }
-    this.dynamicHuffmanEncodeStatus = null;
   }
   reset() {
     this.litLenFreq.fill(0);
     this.disFreq.fill(0);
     this.pos = 0;
     this.msgSize = 0;
+    this.dynamicHuffmanEncodeStatus = null;
   }
 
   /**
@@ -463,6 +469,66 @@ class Block {
    * @param {boolean} isEnd
    */
   encodingBlockDynamicHuffman(out, msg, isEnd) {
+    const {
+      cost,
+      codeSize,
+      litLenSize,
+      disSize,
+      codeHuffmanCode,
+      litLenDisDict,
+      litLenNodes,
+      disNodes,
+    } = this.dynamicHuffmanEncodeStatus;
+
+    const getLitLenBit = (code) => {
+      const c = litLenNodes[code];
+      return [c.code, c.len];
+    };
+
+    const getDistBit = (code) => {
+      const c = disNodes[code];
+      return [c.code, c.len];
+    };
+
+    out.ensureResult(cost);
+    out.putBits(0b100 | (isEnd ? 1 : 0), 3);
+    out.putBits(Math.max(litLenSize - 257, 0), 5);
+    out.putBits(Math.max(disSize - 1, 0), 5);
+    out.putBits(Math.max(codeSize - 4, 0), 4);
+    for (let i = 0; i < codeSize; i++) {
+      out.putBits(codeHuffmanCode[encodeCodeLengthDictOrder[i]].len, 3);
+    }
+    for (let i = 0; i < litLenDisDict.length; i++) {
+      const v = litLenDisDict[i];
+      if (v.length) {
+        out.putBits(v[1], v[0]);
+      } else {
+        const huffCode = codeHuffmanCode[v];
+        out.putRBits(huffCode.code, huffCode.len);
+      }
+    }
+    for (let i = 0; i < this.pos; i++) {
+      if (this.disBuf[i] > 0) {
+        // len
+        const len = this.litBuf[i];
+        const lenCode = getLenCode(len);
+        out.putRBits(...getLitLenBit(lenCode));
+        const lenExtra = getLenExtraBit(lenCode);
+        if (lenExtra.len > 0) {
+          out.putRBits(len - lenExtra.base, lenExtra.len);
+        }
+        // dist
+        const dist = this.disBuf[i];
+        const distCode = getDistCode(dist);
+        out.putRBits(...getDistBit(distCode)); // fixed for static huffman
+        const distExtra = getDistExtraBit(distCode);
+        out.putRBits(dist - distExtra.base, distExtra.len);
+      } else {
+        // literal
+        out.putRBits(...getLitLenBit(this.litBuf[i]));
+      }
+    }
+    out.putRBits(...getLitLenBit(256));
     this.reset();
   }
 
@@ -631,7 +697,7 @@ export class Deflate {
     const s = new Deflate(opt);
     s.endMessage(msg);
     const result = s.result;
-    console.log(result);
+    // console.log(result);
     return result;
   }
 }
