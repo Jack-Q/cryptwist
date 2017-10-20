@@ -233,11 +233,6 @@ const constHuffmanTree = (nodes) => {
   return maxLit;
 };
 
-const encodeCodeLengthDictInvOrder = [
-  3, 17, 15, 13, 11, 9, 7, 5,
-  4, 6, 8, 10, 12, 14, 16, 18,
-  0, 1, 2,
-];
 const encodeCodeLengthDictOrder = [
   16, 17, 18, 0, 8, 7,
   9, 6, 10, 5, 11, 4,
@@ -267,7 +262,7 @@ const encodeCodeLengthDictOrder = [
  */
 const encodeCodeLength = (nodes) => {
   const litLenDisDict = [];
-  const codeFreq = Array(encodeCodeLengthDictInvOrder.length).fill(0);
+  const codeFreq = Array(encodeCodeLengthDictOrder.length).fill(0);
   const freq = f => codeFreq[f]++;
   const len = i => (nodes[i] && nodes[i].len >= 0 ? nodes[i].len : -1);
   for (let i = 0; i < nodes.length; i++) {
@@ -299,7 +294,9 @@ const encodeCodeLength = (nodes) => {
   }
 
   const codeHuffmanCode = codeFreq.map((f, i) => ({ lit: i, freq: f, len: 0 }));
-  const codeSize = constHuffmanTree(Array.from(codeHuffmanCode).sort((i, j) => i.lit - j.lit));
+  constHuffmanTree(codeHuffmanCode);
+  let codeSize = encodeCodeLengthDictOrder.length;
+  while (codeHuffmanCode[encodeCodeLengthDictOrder[codeSize - 1]].len > 0) codeSize--;
   const codeCost = codeSize * 3 + litLenDisDict.reduce((c, v) =>
     c + (v.length ? v[1] : codeHuffmanCode[v].len), 0);
   return { codeSize, codeCost, codeHuffmanCode, litLenDisDict };
@@ -709,7 +706,7 @@ export class Deflate {
     const s = new Deflate(opt);
     s.endMessage(msg);
     const result = s.result;
-    console.log(result);
+    // console.log(result);
     return result;
   }
 }

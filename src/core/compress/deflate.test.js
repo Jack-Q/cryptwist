@@ -27,8 +27,9 @@ tests.forEach((i) => {
 
 const compressTests = [
   '111111111111'.repeat(200),
-  // 'Hello World',
-  // 'message message message',
+  'Hello World',
+  'message message message',
+  Array(1000).fill(0).map(i => String.fromCharCode(Math.random() * 256)).join(''),
 ];
 compressTests.forEach((i) => {
   it('should compress a decompress-able package in copy mode', () => {
@@ -46,6 +47,12 @@ compressTests.forEach((i) => {
   it('should compress a decompress-able package in Huffman mode', () => {
     const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
     const comp = DeflateCompressor.compress(msg, { algorithm: 'huffman', encode: 'forceStaticHuff' });
+    const deComp = DeflateCompressor.decompress(comp);
+    return expect(deComp).toEqual(msg);
+  });
+  it('should compress a decompress-able package in Huffman mode', () => {
+    const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
+    const comp = DeflateCompressor.compress(msg, { algorithm: 'huffman', encode: 'forceDynamicHuff' });
     const deComp = DeflateCompressor.decompress(comp);
     return expect(deComp).toEqual(msg);
   });
