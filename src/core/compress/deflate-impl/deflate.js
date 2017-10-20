@@ -341,7 +341,6 @@ class Block {
     const litLenSize = constHuffmanTree(litLenNodes);
     const disNodes = this.disFreq.map((i, n) => ({ lit: n, freq: i, len: 0 }));
     const disSize = constHuffmanTree(disNodes);
-    console.log(litLenNodes, disNodes);
     const { codeSize, codeCost, codeHuffmanCode, litLenDisDict } = encodeCodeLength([
       ...litLenNodes.slice(0, litLenSize),
       ...(disSize === 0 ? [1] : disNodes.slice(0, disSize)),
@@ -350,7 +349,10 @@ class Block {
         c + f * (disNodes[i].len + getDistExtraBit(i).len), 0) +
       this.litLenFreq.reduce((c, f, i) =>
         c + f * (litLenNodes[i].len + (isLenCode(i) ? getLenExtraBit(i).len : 0)), 0) +
-      codeCost + 5 /* litSize */ + 5  /* distSize */ + 4 /* codeSize */ + 3 /* block header */ + 7 /* incomplete byte overhead */) / 8);
+      codeCost +
+      5 /* litSize */ + 5  /* distSize */ + 4 /* codeSize */
+      + 3 /* block header */ + 7 /* incomplete byte overhead */
+    ) / 8);
     this.dynamicHuffmanEncodeStatus = {
       cost,
       codeSize,
@@ -690,7 +692,7 @@ export class Deflate {
   }
 
   get result() {
-    return this.out.buf.slice(0, this.out.bytePos);
+    return this.out.buf.slice(0, this.out.bytePos + (this.out.bitPos > 0 ? 1 : 0));
   }
 
   static compress(opt, msg) {
