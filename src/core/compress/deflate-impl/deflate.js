@@ -186,7 +186,7 @@ const getLenExtraBit = lenCode => getLenExtraBitTable[lenCode - 257];
 const getStaticHuffLitLenBit = (code) => {
   if (code >= 256 && code <= 279) return [code - 256, 7];
   if (code <= 143 && code >= 0) return [0b00110000 + code, 8];
-  if (code >= 280 && code <= 277) return [0b11000000 + code - 280, 9];
+  if (code >= 280 && code <= 287) return [0b11000000 + code - 280, 8];
   if (code >= 144 && code <= 255) return [0b110010000 + code - 144, 9];
   return [0, 0];
 };
@@ -269,7 +269,7 @@ const encodeCodeLength = (nodes) => {
   const litLenDisDict = [];
   const codeFreq = Array(encodeCodeLengthDictInvOrder.length).fill(0);
   const freq = f => codeFreq[f]++;
-  const len = i => (nodes[i] ? nodes[i].len || 0 : -1);
+  const len = i => (nodes[i] && nodes[i].len >= 0 ? nodes[i].len : -1);
   for (let i = 0; i < nodes.length; i++) {
     if (len(i) > 0) {
       const v = len(i);
@@ -283,17 +283,18 @@ const encodeCodeLength = (nodes) => {
         let l = r;
         while (l > 6) { litLenDisDict.push(16, [2, 0b11]); freq(16); l -= 6; }
         if (l > 3) { litLenDisDict.push(16, [2, l - 3]); freq(16); l = 0; }
-        i += r - l - 1; // balance i++
+        while (l > 0) { litLenDisDict.push(v); freq(v); l--; }
+        i += r;
       }
-    } else {
-      let r = 0;
+    } else if (len(i) === 0) {
+      let r = 1;
       while (len(i + r) === 0) r++;
       let l = r;
       while (l >= 138) { litLenDisDict.push(18, [7, 138 - 11]); freq(18); l -= 138; }
       if (l >= 11) { litLenDisDict.push(18, [7, l - 11]); freq(18); l = 0; }
       if (l >= 3) { litLenDisDict.push(17, [3, l - 3]); freq(17); l = 0; }
-      while (l-- > 0) { litLenDisDict.push(0); freq(0); }
-      i += r - 1; // balance i++
+      while (l > 0) { litLenDisDict.push(0); freq(0); l--; }
+      i += r - 1;
     }
   }
 
@@ -323,7 +324,7 @@ class Block {
   }
 
   emitDist(dist, len) {
-    this.disBuf[getDistCode(dist)]++;
+    this.disFreq[getDistCode(dist)]++;
     this.litLenFreq[getLenCode(len)]++;
     this.msgSize += len;
     return this.emit(dist, len);
@@ -343,7 +344,7 @@ class Block {
     const disSize = constHuffmanTree(disNodes);
     const { codeSize, codeCost, codeHuffmanCode, litLenDisDict } = encodeCodeLength([
       ...litLenNodes.slice(0, litLenSize),
-      ...(disSize === 0 ? [1] : disNodes.slice(0, disSize)),
+      ...(disSize === 0 ? [{ len: 1 }] : disNodes.slice(0, disSize)),
     ]);
     const cost = Math.ceil((this.disFreq.reduce((c, f, i) =>
         c + f * (disNodes[i].len + getDistExtraBit(i).len), 0) +
@@ -371,13 +372,21 @@ class Block {
 
     let encoding = this.type;
     if (encoding === BLOCK_TYPE.OPTIMAL) {
-      // TODO: select optimal coding
-      encoding = BLOCK_TYPE.NO_COMPRESS;
+      const plainCost = this.costBoundBlockPlain();
+      const staticCost = this.costBoundStaticHuff();
+      encoding = plainCost <= staticCost ? BLOCK_TYPE.NO_COMPRESS : BLOCK_TYPE.STATIC_HUFF;
+
+      // for short chunk of message, the overhead of dict is too high using dynamic Huff
+      if (this.pos > 128) {
+        this.dynamicHuffmanEncode();
+        const dynamicCost = this.costBoundDynamicHuff();
+        encoding = dynamicCost < (encoding === BLOCK_TYPE.NO_COMPRESS ? plainCost : staticCost) ?
+          BLOCK_TYPE.DYNAMIC_HUFF : encoding;
+      }
+
+      console.log(`select ${['plain', 'static', 'dynamic'][encoding]} encoding for current block`);
     }
     switch (encoding) {
-      case BLOCK_TYPE.NO_COMPRESS:
-        this.encodeBlockPlain(out, msg, isEnd);
-        break;
       case BLOCK_TYPE.STATIC_HUFF:
         this.encodingBlockStaticHuffman(out, msg, isEnd);
         break;
@@ -385,6 +394,7 @@ class Block {
         this.dynamicHuffmanEncode();
         this.encodingBlockDynamicHuffman(out, msg, isEnd);
         break;
+      case BLOCK_TYPE.NO_COMPRESS:
       default:
         this.encodeBlockPlain(out, msg, isEnd);
     }
@@ -699,7 +709,7 @@ export class Deflate {
     const s = new Deflate(opt);
     s.endMessage(msg);
     const result = s.result;
-    // console.log(result);
+    console.log(result);
     return result;
   }
 }
