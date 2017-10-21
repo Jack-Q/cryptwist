@@ -455,27 +455,9 @@ class Block {
   encodingBlockStaticHuffman(out, msg, isEnd) {
     out.ensureResult(this.costBoundStaticHuff());
     out.putBits(0b010 | (isEnd ? 1 : 0), 3);
-    for (let i = 0; i < this.pos; i++) {
-      if (this.disBuf[i] > 0) {
-        // len
-        const len = this.litBuf[i];
-        const lenCode = getLenCode(len);
-        out.putRBits(...getStaticHuffLitLenBit(lenCode));
-        const lenExtra = getLenExtraBit(lenCode);
-        if (lenExtra.len > 0) {
-          out.putBits(len - lenExtra.base, lenExtra.len);
-        }
-        // dist
-        const dist = this.disBuf[i];
-        const distCode = getDistCode(dist);
-        out.putRBits(distCode, 5); // fixed for static huffman
-        const distExtra = getDistExtraBit(distCode);
-        out.putBits(dist - distExtra.base, distExtra.len);
-      } else {
-        // literal
-        out.putRBits(...getStaticHuffLitLenBit(this.litBuf[i]));
-      }
-    }
+
+    this.encodingMessageLitLenDis(out, getStaticHuffLitLenBit, dist => [dist, 5]);
+
     out.putRBits(...getStaticHuffLitLenBit(256));
     this.reset();
   }
@@ -483,6 +465,31 @@ class Block {
   costBoundDynamicHuff() {
     this.dynamicHuffmanEncode();
     return this.dynamicHuffmanEncodeStatus.cost;
+  }
+
+
+  encodingMessageLitLenDis(out, getLitLenBit, getDistBit) {
+    for (let i = 0; i < this.pos; i++) {
+      if (this.disBuf[i] > 0) {
+        // len
+        const len = this.litBuf[i];
+        const lenCode = getLenCode(len);
+        out.putRBits(...getLitLenBit(lenCode));
+        const lenExtra = getLenExtraBit(lenCode);
+        if (lenExtra.len > 0) {
+          out.putBits(len - lenExtra.base, lenExtra.len);
+        }
+        // dist
+        const dist = this.disBuf[i];
+        const distCode = getDistCode(dist);
+        out.putRBits(...getDistBit(distCode));
+        const distExtra = getDistExtraBit(distCode);
+        out.putBits(dist - distExtra.base, distExtra.len);
+      } else {
+        // literal
+        out.putRBits(...getLitLenBit(this.litBuf[i]));
+      }
+    }
   }
 
   /**
@@ -529,27 +536,9 @@ class Block {
         out.putRBits(huffCode.code, huffCode.len);
       }
     }
-    for (let i = 0; i < this.pos; i++) {
-      if (this.disBuf[i] > 0) {
-        // len
-        const len = this.litBuf[i];
-        const lenCode = getLenCode(len);
-        out.putRBits(...getLitLenBit(lenCode));
-        const lenExtra = getLenExtraBit(lenCode);
-        if (lenExtra.len > 0) {
-          out.putBits(len - lenExtra.base, lenExtra.len);
-        }
-        // dist
-        const dist = this.disBuf[i];
-        const distCode = getDistCode(dist);
-        out.putRBits(...getDistBit(distCode)); // fixed for static huffman
-        const distExtra = getDistExtraBit(distCode);
-        out.putBits(dist - distExtra.base, distExtra.len);
-      } else {
-        // literal
-        out.putRBits(...getLitLenBit(this.litBuf[i]));
-      }
-    }
+
+    this.encodingMessageLitLenDis(out, getLitLenBit, getDistBit);
+
     out.putRBits(...getLitLenBit(256));
     this.reset();
   }
@@ -559,6 +548,14 @@ class Block {
 
 /**
  * Straightforward Huffman scan to calculate character frequencies in message
+ *
+ * In this mode, the buffer is only maintained as a reference to copy message when the optimal
+ * policy for message encoding is just copy it.
+ *
+ * Since no match is made, hash is not maintained in this mode. The buffer after block encoding
+ * become useless. Therefore, readPos and curPos of message buffer is always aligned when encoding
+ * block is cleaned.
+ *
  * @argument {Deflate} ctx
  * @argument {boolean} isEnd
  */
@@ -579,6 +576,11 @@ const messageScanHuffman = (ctx, isEnd) => {
 
 /**
  * Message scan to apply run-length coding (RLC) to consecutive characters
+ * That is, only the consecutive same byte are encoded.
+ *
+ * In this mode, the buffer is maintained as a reference for repetition matching (requires 1 byte)
+ * The buffer will maintain the last byte in previous block when the encoding block is cleaned.
+ *
  * @argument {Deflate} ctx
  * @argument {boolean} isEnd
  */
