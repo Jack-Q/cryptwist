@@ -614,6 +614,13 @@ const messageScanRunBytes = (ctx, isEnd) => {
       block.encodeBlock(out, msg, true);
       msg.readPos = msg.curPos - 1;
     }
+
+    if (msg.curPos === msg.usePos &&
+      msg.usePos === msg.buf.length &&
+      msg.readPos < 0.1 * msg.buf.length) {
+      block.encodeBlock(out, msg, isEnd);
+      msg.readPos = msg.curPos - 1;
+    }
   }
 };
 
@@ -719,6 +726,7 @@ export class Deflate {
     while (left > 0) {
       if (this.in.buf.length === this.in.usePos) {
         // TODO: slide window
+        console.assert(this.in.readPos > 0, 'a buffer should be cleaned');
         const len = this.in.readPos;
         this.in.buf.set(this.in.buf.slice(len), 0);
         this.in.readPos = 0;
