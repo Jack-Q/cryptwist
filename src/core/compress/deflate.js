@@ -29,14 +29,16 @@ export class DeflateCompressor {
     };
 
     const yieldByteArray = (arr, off, len) => {
+      const useBuffer = arr === buffer;
       if (bufferPos + len >= buffer.length) expandBuffer();
       for (let i = 0; i < len; i += 1) {
-        buffer[bufferPos + i] = arr[off + i];
+        buffer[bufferPos + i] = (useBuffer ? buffer : arr)[off + i];
       }
       bufferPos += len;
     };
 
     const getBit = (i) => {
+      console.assert(i < 20, `maximum size of bit to get from input stream is 20, got ${i}`);
       if (i > 8) {
         const lo = getBit(8);
         const hi = getBit(i - 8);
@@ -60,7 +62,7 @@ export class DeflateCompressor {
         131, 163, 195, 227,
       ];
       if (len <= 264) return len - 254;
-      if (len === 285) return len;
+      if (len === 285) return 258;
       const bit = (len - 261) >>> 2;
       return getExtraLenTable[len - 265] + getBit(bit);
     };
@@ -87,7 +89,7 @@ export class DeflateCompressor {
       // 8 bit len, 0 - 143
       if (fix <= 0b10111) return ((fix << 3) | getRBit(3)) - 48;
       // 8 bit len, 280 - 287
-      if (fix <= 0b11000) return getRBit(3);
+      if (fix <= 0b11000) return getRBit(3) + 280;
       // 9 bit len, 144 - 255
       return ((fix << 4) | getRBit(4)) - 256;
     };
@@ -122,8 +124,8 @@ export class DeflateCompressor {
           tbl[val][nxtBit[val]++] = i;
         }
       }
-
       return () => {
+        if (tbl.min > 20) throw 'input message defines and uses an invalid Huffman tree';
         let bits = getRBit(tbl.min);
         for (let i = tbl.min; i <= tbl.max; i++) {
           if (tbl[i]) {

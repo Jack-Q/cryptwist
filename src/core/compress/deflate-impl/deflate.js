@@ -1,5 +1,10 @@
 import { reverseBits } from '../../util';
 
+// minimal length of repetition to be encoded
+const MIN_ENCODE_LEN = 3;
+// maximal length of repetition to be encoded
+const MAX_ENCODE_LEN = 258;
+
 class InputBuffer {
   constructor() {
     this.buf = new Uint8Array(1 << (10 + 6));
@@ -193,8 +198,16 @@ const getStaticHuffLitLenBit = (code) => {
 
 const constHuffmanTree = (nodes) => {
   const tree = Array.from(nodes.filter(e => e.freq > 0));
+
   if (tree.length === 0) return 0;
+
   const maxLit = tree[tree.length - 1].lit + 1;
+  if (tree.length === 1) {
+    tree[0].len = 1;
+    tree[0].code = 0;
+    return maxLit;
+  }
+
   // construct tree
   while (tree.length > 1) {
     tree.sort((i, j) => i.freq - j.freq);
@@ -307,8 +320,8 @@ class Block {
   constructor(size = 1 << 6, type = BLOCK_TYPE.OPTIMAL) {
     this.type = type;
     this.size = size;
-    this.litBuf = new Uint8Array(size);
-    this.disBuf = new Uint8Array(size);
+    this.litBuf = Array(size);
+    this.disBuf = Array(size);
     this.litLenFreq = Array(286).fill(0);
     this.disFreq = Array(32).fill(0);
     this.pos = 0;
@@ -450,14 +463,14 @@ class Block {
         out.putRBits(...getStaticHuffLitLenBit(lenCode));
         const lenExtra = getLenExtraBit(lenCode);
         if (lenExtra.len > 0) {
-          out.putRBits(len - lenExtra.base, lenExtra.len);
+          out.putBits(len - lenExtra.base, lenExtra.len);
         }
         // dist
         const dist = this.disBuf[i];
         const distCode = getDistCode(dist);
         out.putRBits(distCode, 5); // fixed for static huffman
         const distExtra = getDistExtraBit(distCode);
-        out.putRBits(dist - distExtra.base, distExtra.len);
+        out.putBits(dist - distExtra.base, distExtra.len);
       } else {
         // literal
         out.putRBits(...getStaticHuffLitLenBit(this.litBuf[i]));
@@ -524,14 +537,14 @@ class Block {
         out.putRBits(...getLitLenBit(lenCode));
         const lenExtra = getLenExtraBit(lenCode);
         if (lenExtra.len > 0) {
-          out.putRBits(len - lenExtra.base, lenExtra.len);
+          out.putBits(len - lenExtra.base, lenExtra.len);
         }
         // dist
         const dist = this.disBuf[i];
         const distCode = getDistCode(dist);
         out.putRBits(...getDistBit(distCode)); // fixed for static huffman
         const distExtra = getDistExtraBit(distCode);
-        out.putRBits(dist - distExtra.base, distExtra.len);
+        out.putBits(dist - distExtra.base, distExtra.len);
       } else {
         // literal
         out.putRBits(...getLitLenBit(this.litBuf[i]));
@@ -570,7 +583,38 @@ const messageScanHuffman = (ctx, isEnd) => {
  * @argument {boolean} isEnd
  */
 const messageScanRunBytes = (ctx, isEnd) => {
+  const { in: msg, out, blockBuf: block } = ctx;
+  while (msg.curPos < msg.usePos) {
+    const lastCh = msg.buf[msg.curPos - 1];
+    if (msg.buf[msg.curPos] !== lastCh) {
+      // no repetition
+      block.emitLiteral(msg.buf[msg.curPos++]);
+    } else {
+      const maxPos = Math.min(msg.curPos + MAX_ENCODE_LEN, msg.usePos);
+      let pos = msg.curPos + 1;
+      while (pos < maxPos && msg.buf[pos] === lastCh) pos++;
 
+      // if (pos === msg.usePos && !isEnd) {
+
+      // } else
+      if (pos - msg.curPos >= MIN_ENCODE_LEN) {
+        block.emitDist(1, pos - msg.curPos);
+        msg.curPos = pos;
+      } else {
+        while (msg.curPos < pos && !block.emitLiteral(lastCh)) msg.curPos++;
+      }
+    }
+
+    if (block.full) {
+      block.encodeBlock(out, msg, msg.curPos === msg.usePos ? isEnd : false);
+      msg.readPos = msg.curPos - 1;
+    }
+
+    if (msg.curPos === msg.usePos && isEnd) {
+      block.encodeBlock(out, msg, true);
+      msg.readPos = msg.curPos - 1;
+    }
+  }
 };
 
 /**
