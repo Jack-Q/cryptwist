@@ -484,10 +484,23 @@ class Block {
     out.putBits(0b000 | (isEnd ? 1 : 0), 3);
     if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
     const len = this.msgSize;
-    console.assert(msg.curPos - len > 0, 'message to be copied should remained in encoding buffer');
     out.putByte(len); out.putByte(len >>> 8); // length
     out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
-    out.putBytes(msg.buf, msg.curPos - len, len);
+    if (msg.curPos - len < 0) {
+      for (let i = 0; i < this.pos; i++) {
+        if (this.disBuf[i] > 0) {
+          // len
+          const secLen = this.litBuf[i];
+          const dist = this.disBuf[i];
+          for (let j = 0; j < secLen; j++) out.putByte(out.buf[out.bytePos - dist]);
+        } else {
+          // literal
+          out.putByte(this.litBuf[i]);
+        }
+      }
+    } else {
+      out.putBytes(msg.buf, msg.curPos - len, len);
+    }
     this.reset();
   }
 
