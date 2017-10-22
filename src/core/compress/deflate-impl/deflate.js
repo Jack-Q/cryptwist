@@ -4,6 +4,10 @@ import { reverseBits } from '../../util';
 const MIN_ENCODE_LEN = 3;
 // maximal length of repetition to be encoded
 const MAX_ENCODE_LEN = 258;
+// minimal look ahead length for message repetition matching
+const MIN_LOOK_AHEAD = MAX_ENCODE_LEN + MAX_ENCODE_LEN + 1;
+
+const MAX_DISTANCE = 32768;
 
 class InputBuffer {
   constructor() {
@@ -70,6 +74,54 @@ class OutputBuffer {
     this.ensureResult(len);
     this.buf.set(buf.slice(off, off + len), this.bytePos);
     this.bytePos += len;
+  }
+}
+
+class MatcherHashTable {
+  constructor(hashBitSize, matchLimit = Infinity) {
+    console.assert(hashBitSize <= 18 && hashBitSize > 8 && hashBitSize % 3 === 0,
+      `invalid hash table size in bit (got ${hashBitSize})`);
+    this.bitSize = hashBitSize;
+    this.bitShiftAmount = hashBitSize / 3;
+    this.bitHashKeyMask = 0xffffffff >>> (32 - hashBitSize);
+
+    this.matchLimit = matchLimit;
+
+    this.size = 2 ** hashBitSize;
+    this.buff = Array(hashBitSize);
+  }
+
+  updateHashKey(last, cur) {
+    return ((last << this.bitShiftAmount) ^ cur) & this.bitHashKeyMask;
+  }
+
+  createHashKey(ch1, ch2, ch3) {
+    return this.updateHashKey((ch1 << this.bitShiftAmount) ^ ch2, ch3);
+  }
+
+  /**
+   * @returns {Array<number>} matched position
+   */
+  matchCandidate(hash, msg, ch, chN, chNN) {
+    const list = this.buff[hash];
+    if (!list) return [];
+    return list.filter(p =>
+      msg.buf[p] === ch &&
+      msg.buf[p + 1] === chN &&
+      msg.buf[p + 2] === chNN).slice(-this.matchLimit);
+  }
+
+  store(hash, pos) {
+    if (!this.buff[hash]) this.buff[hash] = [];
+    this.buff[hash].push(pos);
+  }
+
+  slideHashTable(offset) {
+    for (let i = 0; i < this.size; i++) {
+      if (this.buff[i]) {
+        this.buff[i] = this.buff[i].map(p => p - offset).filter(p => p >= 0);
+      }
+    }
   }
 }
 
@@ -547,6 +599,32 @@ class Block {
 }
 
 /**
+ * Message scan without compression, just copy message to output buffer
+ *
+ * In this mode, the block buffer is always not used (no hash table is maintained)
+ * @argument {Deflate} ctx
+ * @argument {boolean} isEnd
+ */
+const messageScanCopy = (ctx, isEnd) => {
+  const { in: msg, out } = ctx;
+  out.ensureResult(msg.usePos - msg.curPos + 6);
+  // since message is copied into ``in'' buffer first,
+  // the length of msg can always satisfied to the constraint of block length
+  if (isEnd || msg.usePos - msg.curPos >= msg.buf.length / 2) {
+    out.putBits(0b000 | (isEnd ? 1 : 0), 3);
+    if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
+
+    const len = msg.usePos - msg.curPos;
+    out.putByte(len); out.putByte(len >>> 8); // length
+    out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
+    out.putBytes(msg.buf, msg.curPos, len);
+
+    msg.curPos = msg.usePos;
+    msg.readPos = msg.usePos;
+  }
+};
+
+/**
  * Straightforward Huffman scan to calculate character frequencies in message
  *
  * In this mode, the buffer is only maintained as a reference to copy message when the optimal
@@ -627,38 +705,73 @@ const messageScanRunBytes = (ctx, isEnd) => {
 };
 
 /**
- * Message scan without compression, just copy message to output buffer
- *
- * In this mode, the block buffer is always not used (no hash table is maintained)
- * @argument {Deflate} ctx
- * @argument {boolean} isEnd
- */
-const messageScanCopy = (ctx, isEnd) => {
-  const { in: msg, out } = ctx;
-  out.ensureResult(msg.usePos - msg.curPos + 6);
-  // since message is copied into ``in'' buffer first,
-  // the length of msg can always satisfied to the constraint of block length
-  if (isEnd || msg.usePos - msg.curPos >= msg.buf.length / 2) {
-    out.putBits(0b000 | (isEnd ? 1 : 0), 3);
-    if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
-
-    const len = msg.usePos - msg.curPos;
-    out.putByte(len); out.putByte(len >>> 8); // length
-    out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
-    out.putBytes(msg.buf, msg.curPos, len);
-
-    msg.curPos = msg.usePos;
-    msg.readPos = msg.usePos;
-  }
-};
-
-/**
  * Message scan with historic repetition matching and encoding (excluding lazy matching)
  * @argument {Deflate} ctx
  * @argument {boolean} isEnd
  */
 const messageScanMatch = (ctx, isEnd) => {
+  const { in: msg, out, blockBuf: block, hashTable } = ctx;
+  const termPos = isEnd ? msg.usePos : msg.usePos - MIN_LOOK_AHEAD;
+  const loopEnd = isEnd ? termPos - 2 : termPos;
 
+  let lastHash = hashTable.createHashKey(0, msg.buf[msg.curPos], msg.buf[msg.curPos + 1]);
+
+  while (msg.curPos < loopEnd) {
+    const ch = msg.buf[msg.curPos];
+    const chN = msg.buf[msg.curPos + 1];
+    const chNN = msg.buf[msg.curPos + 2];
+
+    lastHash = hashTable.updateHashKey(lastHash, chNN);
+    const candidate = hashTable
+      .matchCandidate(lastHash, msg, ch, chN, chNN)
+      .filter(p => msg.curPos - p <= MAX_DISTANCE);
+
+    if (candidate.length > 0) {
+      let pos = 0;
+      let length = 0;
+      candidate.map((p) => {
+        let l = 3;
+        while (msg.buf[p + l] === msg.buf[msg.curPos + l]
+          && l < MAX_ENCODE_LEN
+          && msg.curPos + l < termPos) l++;
+        return Math.min(l, termPos - msg.curPos);
+      }).reduce((l, c, i) => {
+        if (c > l) {
+          pos = candidate[i];
+          length = c;
+          return c;
+        }
+        return l;
+      }, 0);
+
+      block.emitDist(msg.curPos - pos, length);
+      for (let end = msg.curPos + length; msg.curPos < end; msg.curPos++) {
+        lastHash = hashTable.updateHashKey(lastHash, msg.buf[msg.curPos + 2]);
+        hashTable.store(lastHash, msg.curPos);
+      }
+    } else {
+      block.emitLiteral(ch);
+      hashTable.store(lastHash, msg.curPos++);
+    }
+
+
+    if (block.full) {
+      block.encodeBlock(out, msg, msg.curPos === msg.usePos ? isEnd : false);
+    }
+  }
+
+  if (isEnd) {
+    // two possible final block
+    if (msg.curPos < msg.usePos) block.emitLiteral(msg.buf[msg.curPos++]);
+    if (msg.curPos < msg.usePos) block.emitLiteral(msg.buf[msg.curPos++]);
+
+    console.assert(msg.curPos === msg.usePos, 'all message should be consumed for last block');
+    block.encodeBlock(out, msg, true);
+  }
+
+  if (msg.curPos + MIN_LOOK_AHEAD >= msg.buf.length && msg.readPos === 0) {
+    msg.readPos = msg.buf.length / 2;
+  }
 };
 
 /**
@@ -712,6 +825,7 @@ export class Deflate {
       scanAlgorithmList[this.opt.algorithm] ||
       scanAlgorithmList[Object.keys(scanAlgorithmList)[0]]
     ).bind(this, this);
+    this.hashTable = new MatcherHashTable(15);
   }
 
   endMessage(msg) {
@@ -727,13 +841,13 @@ export class Deflate {
     let left = msg.length;
     while (left > 0) {
       if (this.in.buf.length === this.in.usePos) {
-        // TODO: slide window
         console.assert(this.in.readPos > 0, 'a buffer should be cleaned');
         const len = this.in.readPos;
         this.in.buf.set(this.in.buf.slice(len), 0);
         this.in.readPos = 0;
         this.in.curPos -= len;
         this.in.usePos -= len;
+        this.hashTable.slideHashTable(len);
       }
       if (left <= this.in.buf.length - this.in.usePos) {
         // the last chunk of message
