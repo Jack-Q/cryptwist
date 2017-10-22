@@ -26,35 +26,32 @@ tests.forEach((i) => {
 // printHash(decompressedFileBuffer);
 
 const compressTests = [
-  '111111111111'.repeat(200),
-  'Hello World',
-  'message message message',
-  Array(1000).fill(0).map(i => String.fromCharCode(Math.random() * 256)).join(''),
+  '0011223344000111222333444000011112222333344440000011111222223333344444'.repeat(50),
+  'Hello World'.repeat(100) + 'World Hello'.repeat(100),
+  'message message message message'.repeat(100),
+  // random test
+  // Array(80 * (2 ** 10)).fill(0).map(i => String.fromCharCode(Math.random() * 128)).join(''),
 ];
 compressTests.forEach((i) => {
-  it('should compress a decompress-able package in copy mode', () => {
-    const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
-    const comp = DeflateCompressor.compress(msg, { algorithm: 'copy' });
+  const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
+  const t = opt => () => {
+    const comp = DeflateCompressor.compress(msg, opt);
     const deComp = DeflateCompressor.decompress(comp);
+    console.log(`compression ratio: ${(comp.length / msg.length * 100).toFixed(2)}%`);
     return expect(deComp).toEqual(msg);
-  });
-  it('should compress a decompress-able package in Huffman mode', () => {
-    const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
-    const comp = DeflateCompressor.compress(msg, { algorithm: 'huffman' });
-    const deComp = DeflateCompressor.decompress(comp);
-    return expect(deComp).toEqual(msg);
-  });
-  it('should compress a decompress-able package in Huffman mode', () => {
-    const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
-    const comp = DeflateCompressor.compress(msg, { algorithm: 'huffman', encode: 'forceStaticHuff' });
-    const deComp = DeflateCompressor.decompress(comp);
-    return expect(deComp).toEqual(msg);
-  });
-  it('should compress a decompress-able package in Huffman mode', () => {
-    const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
-    const comp = DeflateCompressor.compress(msg, { algorithm: 'huffman', encode: 'forceDynamicHuff' });
-    const deComp = DeflateCompressor.decompress(comp);
-    return expect(deComp).toEqual(msg);
-  });
+  };
+  it('should compress a decompress-able package in copy mode', t({ algorithm: 'copy' }));
+  it('should compress a decompress-able package in match mode', t({ algorithm: 'runBytes', encode: 'forceNoCompress' }));
+  it('should compress a decompress-able package in run-bytes mode', t({ algorithm: 'runBytes', encode: 'forceStaticHuff' }));
+  it('should compress a decompress-able package in run-bytes mode', t({ algorithm: 'runBytes', encode: 'forceDynamicHuff' }));
+  it('should compress a decompress-able package in match mode', t({ algorithm: 'huffman', encode: 'forceNoCompress' }));
+  it('should compress a decompress-able package in Huffman mode', t({ algorithm: 'huffman', encode: 'forceStaticHuff' }));
+  it('should compress a decompress-able package in Huffman mode', t({ algorithm: 'huffman', encode: 'forceDynamicHuff' }));
+  it('should compress a decompress-able package in match mode', t({ algorithm: 'match', encode: 'forceNoCompress' }));
+  it('should compress a decompress-able package in match mode', t({ algorithm: 'match', encode: 'forceDynamicHuff' }));
+  it('should compress a decompress-able package in match mode', t({ algorithm: 'match', encode: 'forceStaticHuff' }));
+  it('should compress a decompress-able package in lazy match mode', t({ algorithm: 'lazyMatch', encode: 'forceNoCompress' }));
+  it('should compress a decompress-able package in lazy match mode', t({ algorithm: 'lazyMatch', encode: 'forceDynamicHuff' }));
+  it('should compress a decompress-able package in lazy match mode', t({ algorithm: 'lazyMatch', encode: 'forceStaticHuff' }));
 })
 ;

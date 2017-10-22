@@ -794,7 +794,114 @@ const messageScanMatch = (ctx, isEnd) => {
  * @argument {boolean} isEnd
  */
 const messageScanLazyMatch = (ctx, isEnd) => {
+  const { in: msg, out, blockBuf: block, hashTable } = ctx;
+  const termPos = isEnd ? msg.usePos : msg.usePos - MIN_LOOK_AHEAD;
+  const loopEnd = isEnd ? termPos - 2 : termPos;
 
+  let lastHash = hashTable.createHashKey(0, msg.buf[msg.curPos], msg.buf[msg.curPos + 1]);
+  const matchBuffer = ctx.matchBuffer;
+  let curPos = ctx.lazyMatchPos >= 0 ? ctx.lazyMatchPos : 0;
+  console.assert(curPos + matchBuffer.length === msg.curPos, 'curPos should be synced');
+  const checkBuffer = () => {
+    if (block.full) {
+      block.encodeBlock(out, msg, msg.curPos === msg.usePos ? isEnd : false);
+    }
+  };
+  while (curPos < loopEnd) {
+    const ch = msg.buf[curPos];
+    const chN = msg.buf[curPos + 1];
+    const chNN = msg.buf[curPos + 2];
+
+    lastHash = hashTable.updateHashKey(lastHash, chNN);
+    const candidate = hashTable
+      .matchCandidate(lastHash, msg, ch, chN, chNN)
+      .filter(p => curPos - p <= MAX_DISTANCE);
+
+    if (candidate.length > 0) {
+      let pos = 0;
+      let len = 0;
+      candidate.map((p) => {
+        let l = 3;
+        while (msg.buf[p + l] === msg.buf[curPos + l]
+          && l < MAX_ENCODE_LEN
+          && curPos + l < termPos) l++;
+        return Math.min(l, termPos - curPos);
+      }).reduce((l, c, i) => {
+        if (c > l) {
+          pos = candidate[i];
+          len = c;
+          return c;
+        }
+        return l;
+      }, 0);
+
+      matchBuffer.push({ len, pos: curPos - pos, ch });
+    } else if (matchBuffer.length === 0) {
+      // emit literal
+      msg.curPos++;
+      block.emitLiteral(ch);
+      checkBuffer();
+    } else {
+      // wait for more match
+      matchBuffer.push({ len: 0, ch });
+    }
+    hashTable.store(lastHash, curPos++);
+
+    if (matchBuffer.length === 3) {
+      let ind = 0;
+      matchBuffer.reduce((m, c, i) => {
+        if (c.len > m) { ind = i; return c.len; }
+        return m;
+      }, 0);
+
+      for (let i = 0; i < ind; i++) {
+        msg.curPos++;
+        block.emitLiteral(matchBuffer.shift().ch);
+        checkBuffer();
+      }
+      const mat = matchBuffer[0];
+      if (mat.len > matchBuffer.length) {
+        const updateLen = mat.len - matchBuffer.length;
+        for (let end = curPos + updateLen; curPos < end; curPos++) {
+          lastHash = hashTable.updateHashKey(lastHash, msg.buf[curPos + 2]);
+          hashTable.store(lastHash, curPos);
+        }
+        matchBuffer.splice(0, matchBuffer.length);
+      } else {
+        matchBuffer.splice(0, mat.len);
+      }
+      msg.curPos += mat.len;
+      block.emitDist(mat.pos, mat.len);
+      checkBuffer();
+      while (matchBuffer.length > 0 && matchBuffer[0].len === 0) {
+        msg.curPos++;
+        block.emitLiteral(matchBuffer.shift().ch);
+        checkBuffer();
+      }
+    }
+  }
+
+  if (isEnd) {
+    while (matchBuffer.length > 0) {
+      msg.curPos++;
+      block.emitLiteral(matchBuffer.shift().ch);
+      checkBuffer();
+    }
+    // two possible final block
+    if (msg.curPos < msg.usePos) block.emitLiteral(msg.buf[msg.curPos++]);
+    checkBuffer();
+    if (msg.curPos < msg.usePos) block.emitLiteral(msg.buf[msg.curPos++]);
+    checkBuffer();
+
+    console.assert(msg.curPos === msg.usePos, 'all message should be consumed for last block');
+    if (block.pos > 0) block.encodeBlock(out, msg, true);
+  }
+
+  if (msg.curPos + MIN_LOOK_AHEAD >= msg.buf.length && msg.readPos === 0) {
+    msg.readPos = Math.min(msg.buf.length >>> 1, msg.curPos);
+  }
+  // save lazy matching state
+  ctx.lazyMatchPos = curPos;
 };
 
 export class DeflateOption {
@@ -840,6 +947,8 @@ export class Deflate {
       scanAlgorithmList[Object.keys(scanAlgorithmList)[0]]
     ).bind(this, this);
     this.hashTable = new MatcherHashTable(15);
+    this.matchBuffer = []; // catch match buffer in context
+    this.lazyMatchPos = -1;
   }
 
   endMessage(msg) {
@@ -862,6 +971,7 @@ export class Deflate {
         this.in.curPos -= len;
         this.in.usePos -= len;
         this.hashTable.slideHashTable(len);
+        if (this.lazyMatchPos >= 0) this.lazyMatchPos -= len;
       }
       if (left <= this.in.buf.length - this.in.usePos) {
         // the last chunk of message

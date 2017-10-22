@@ -102,8 +102,8 @@ The core module contains implementation of various cryptographic primitives.
  * [ ] Zlib format ([RFC1950](https://tools.ietf.org/html/rfc1950))
    - [ ] compress
    - [x] decompress
- * [ ] DEFLATE format ([RFC1951](https://tools.ietf.org/html/rfc1951))
-   - [ ] compress
+ * [x] DEFLATE format ([RFC1951](https://tools.ietf.org/html/rfc1951))
+   - [x] compress
    - [x] decompress
  * [ ] Gzip format ([RFC1952](https://tools.ietf.org/html/rfc1952))
    - [ ] compress
