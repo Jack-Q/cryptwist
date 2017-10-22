@@ -10,8 +10,8 @@ const MIN_LOOK_AHEAD = MAX_ENCODE_LEN + MAX_ENCODE_LEN + 1;
 const MAX_DISTANCE = 32768;
 
 class InputBuffer {
-  constructor() {
-    this.buf = new Uint8Array(1 << (10 + 6));
+  constructor(size) {
+    this.buf = new Uint8Array(size);
     this.readPos = 0; // current position of used message (out of the range of matching)
     this.curPos = 0; // current processing position of scan algorithm
     this.usePos = 0; // current occupied buffer
@@ -484,6 +484,7 @@ class Block {
     out.putBits(0b000 | (isEnd ? 1 : 0), 3);
     if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
     const len = this.msgSize;
+    console.assert(msg.curPos - len > 0, 'message to be copied should remained in encoding buffer');
     out.putByte(len); out.putByte(len >>> 8); // length
     out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
     out.putBytes(msg.buf, msg.curPos - len, len);
@@ -770,7 +771,7 @@ const messageScanMatch = (ctx, isEnd) => {
   }
 
   if (msg.curPos + MIN_LOOK_AHEAD >= msg.buf.length && msg.readPos === 0) {
-    msg.readPos = msg.buf.length / 2;
+    msg.readPos = Math.min(msg.buf.length >>> 1, msg.curPos);
   }
 };
 
@@ -816,10 +817,10 @@ export class Deflate {
 
   init() {
     const bufferSize = 1 << (10 + 5);
-    this.in = new InputBuffer(bufferSize << 1);
+    this.in = new InputBuffer((bufferSize << 1) - 1);
     this.out = new OutputBuffer(bufferSize << 1);
-    this.encodeBlockMode =
-      encodeBlockMode[this.opt.encode] || BLOCK_TYPE.OPTIMAL;
+    this.encodeBlockMode = encodeBlockMode[this.opt.encode];
+    if (this.encodeBlockMode === undefined) this.encodeBlockMode = BLOCK_TYPE.OPTIMAL;
     this.blockBuf = new Block(bufferSize, this.encodeBlockMode);
     this.scanMessage = (
       scanAlgorithmList[this.opt.algorithm] ||
