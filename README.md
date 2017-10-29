@@ -99,14 +99,14 @@ The core module contains implementation of various cryptographic primitives.
  * [ ] ECDSA
 
 ### Compression Algorithms
- * [ ] Zlib format ([RFC1950](https://tools.ietf.org/html/rfc1950))
-   - [ ] compress
+ * [x] Zlib format ([RFC1950](https://tools.ietf.org/html/rfc1950))
+   - [x] compress
    - [x] decompress
  * [x] DEFLATE format ([RFC1951](https://tools.ietf.org/html/rfc1951))
    - [x] compress
    - [x] decompress
- * [ ] Gzip format ([RFC1952](https://tools.ietf.org/html/rfc1952))
-   - [ ] compress
+ * [x] Gzip format ([RFC1952](https://tools.ietf.org/html/rfc1952))
+   - [x] compress
    - [x] decompress
  * [ ] BZip2 format 
    - [ ] compress

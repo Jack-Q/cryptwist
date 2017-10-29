@@ -13,6 +13,8 @@ const encoders = [
   AsciiEncoder,
 ];
 
+const getEncoder = name => encoders.find(i => i.name === name);
+
 const Encoder = {
   Base64Encoder,
   Base32Encoder,
@@ -23,9 +25,15 @@ const Encoder = {
   AsciiEncoder,
   encoders,
 
-  getEncoder(name) {
-    return encoders.find(i => i.name === name);
-  },
+  getEncoder,
 };
 
+export { Base64Encoder } from './base64';
+export { Base32Encoder } from './base32';
+export { Base16Encoder } from './base16';
+export { Base85Encoder } from './base85';
+export { HexEncoder } from './hex';
+export { AsciiArmoredEncoder } from './ascii-armored';
+export { AsciiEncoder } from './ascii';
+export { getEncoder, encoders };
 export default Encoder;

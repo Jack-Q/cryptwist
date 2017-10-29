@@ -1,6 +1,6 @@
 const encoderName = 'ASCII';
 
-const AsciiEncoder = {
+export const AsciiEncoder = {
   name: encoderName,
   encode: (arr, len, off) => Array.from(arr.slice(off, off + len))
     .map(i => String.fromCharCode(i)).join(''),

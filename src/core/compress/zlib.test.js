@@ -32,5 +32,6 @@ const compressTest = [
 
 
 compressTest.forEach(t => it('should compress valid zlib format message',
-  () => expect(ZlibCompressor.decompress(ZlibCompressor.compress(Encode.AsciiEncoder.decode(t)))).toEqual(Encode.AsciiEncoder.decode(t)),
+  () => expect(ZlibCompressor.decompress(ZlibCompressor.compress(Encode.AsciiEncoder.decode(t))))
+    .toEqual(Encode.AsciiEncoder.decode(t)),
 ));

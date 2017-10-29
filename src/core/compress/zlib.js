@@ -8,7 +8,7 @@ import { Adler32Checksum } from './zlib-util/edler';
 // +---+---+   +---+---+---+---+  +============+---+---+---+---+
 // |CMF|FLG|   |    DICT-ID    |  | compressed |    Adler-32   |
 // +---+---+   +---+---+---+---+  +============+---+---+---+---+
-
+//             (if FLG.DICT set)
 const CM_DEFLATE = 8;
 const C_INFO_DEFLATE_32K = 7; // 32KB window size for DEFLATE algorithm
 const FLG_DICT_ON = 1;

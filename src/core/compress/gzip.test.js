@@ -16,3 +16,20 @@ tests.forEach((i) => {
       .join(''),
   ).toEqual(i[1]));
 });
+
+// Tests for en-compressor
+// since the core compress process of zlib is based on
+// deflate implementation, the test here is focused on
+// the wrapper format and the checksum (Adler32)
+const compressTest = [
+  '\0',
+  'Hello World',
+  'message and message',
+];
+
+
+compressTest.forEach(t => it('should compress valid zlib format message',
+  () => expect(GzipCompressor.decompress(GzipCompressor.compress(Encode.AsciiEncoder.decode(t))))
+    .toEqual(Encode.AsciiEncoder.decode(t)),
+));
+
