@@ -18,6 +18,8 @@ tests.forEach((i) => {
   ).toEqual(i[1]));
 });
 
+// following code could pipe a random generated file to decoder to test
+// the compatibility of the inflator with reference implementation of zlib
 // const file = fs.readFileSync('rand.zlib');
 // const printHash = buf => console.log(Encode.HexEncoder.encode(SHA256Hash.hash(buf)));
 // const compressedFileBuffer = new Uint8Array(file.buffer);
@@ -26,18 +28,18 @@ tests.forEach((i) => {
 // printHash(decompressedFileBuffer);
 
 const compressTests = [
-  '0011223344000111222333444000011112222333344440000011111222223333344444'.repeat(50),
-  'Hello World'.repeat(100) + 'World Hello'.repeat(100),
-  'message message message message'.repeat(100),
+  '0011223344000111222333444000011112222333344440000011111222223333344444'.repeat(100),
+  'Hello World'.repeat(500) + 'World Hello'.repeat(500),
+  'message message message message'.repeat(500),
   // random test
-  // Array(80 * (2 ** 10)).fill(0).map(i => String.fromCharCode(Math.random() * 128)).join(''),
+  // Array(2 * (2 ** 10)).fill(0).map(i => String.fromCharCode(Math.random() * 128)).join(''),
 ];
 compressTests.forEach((i) => {
   const msg = Uint8Array.from(i.split('').map(ch => ch.charCodeAt(0)));
   const t = opt => () => {
     const comp = DeflateCompressor.compress(msg, opt);
     const deComp = DeflateCompressor.decompress(comp);
-    console.log(`compression ratio: ${(comp.length / msg.length * 100).toFixed(2)}%`);
+    // console.log(`compression ratio: ${(comp.length / msg.length * 100).toFixed(2)}%`);
     return expect(deComp).toEqual(msg);
   };
   it('should compress a decompress-able package in copy mode', t({ algorithm: 'copy' }));

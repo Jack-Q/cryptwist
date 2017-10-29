@@ -7,6 +7,8 @@ const MAX_ENCODE_LEN = 258;
 // minimal look ahead length for message repetition matching
 const MIN_LOOK_AHEAD = MAX_ENCODE_LEN + MAX_ENCODE_LEN + 1;
 
+const MAX_PLAIN_BLOCK_SIZE = (1 << 16) - 1;
+
 const MAX_DISTANCE = 32768;
 
 class InputBuffer {
@@ -472,7 +474,7 @@ class Block {
   /**
    * calculate cost to encode message block in plain message
    */
-  costBoundBlockPlain() { return this.message + 4 + 2; }
+  costBoundBlockPlain() { return this.msgSize + 4 + 2; }
 
   /**
    * @param {OutputBuffer} out
@@ -480,22 +482,48 @@ class Block {
    * @param {boolean} isEnd
    */
   encodeBlockPlain(out, msg, isEnd) {
+    let offset = 0;
+    while (this.msgSize > MAX_PLAIN_BLOCK_SIZE) {
+      out.ensureResult(MAX_PLAIN_BLOCK_SIZE + 5);
+      out.putBits(0b000, 3); // cannot be the final block
+      if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
+      const len = MAX_PLAIN_BLOCK_SIZE;
+      out.putByte(len); out.putByte(len >>> 8); // length
+      out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
+      if (msg.curPos - this.msgSize + offset < 0) {
+        for (let i = 0; i < this.pos; i++) {
+          if (this.disBuf[offset + i] > 0) {
+            // len
+            const secLen = this.litBuf[offset + i];
+            const dist = this.disBuf[offset + i];
+            for (let j = 0; j < secLen; j++) out.putByte(out.buf[out.bytePos - dist]);
+          } else {
+            // literal
+            out.putByte(this.litBuf[offset + i]);
+          }
+        }
+      } else {
+        out.putBytes(msg.buf, msg.curPos - this.msgSize + offset, len);
+      }
+      offset += MAX_PLAIN_BLOCK_SIZE;
+    }
+
     out.ensureResult(this.costBoundBlockPlain());
     out.putBits(0b000 | (isEnd ? 1 : 0), 3);
     if (out.bitPos !== 0) { out.bitPos = 0; out.bytePos++; }
-    const len = this.msgSize;
+    const len = this.msgSize - offset;
     out.putByte(len); out.putByte(len >>> 8); // length
     out.putByte(~len); out.putByte((~len) >>> 8); // 1's complement of len
     if (msg.curPos - len < 0) {
       for (let i = 0; i < this.pos; i++) {
-        if (this.disBuf[i] > 0) {
+        if (this.disBuf[offset + i] > 0) {
           // len
-          const secLen = this.litBuf[i];
-          const dist = this.disBuf[i];
+          const secLen = this.litBuf[offset + i];
+          const dist = this.disBuf[offset + i];
           for (let j = 0; j < secLen; j++) out.putByte(out.buf[out.bytePos - dist]);
         } else {
           // literal
-          out.putByte(this.litBuf[i]);
+          out.putByte(this.litBuf[offset + i]);
         }
       }
     } else {
