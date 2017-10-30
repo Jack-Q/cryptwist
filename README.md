@@ -75,7 +75,7 @@ The core module contains implementation of various cryptographic primitives.
 ### Symmetric-Key Algorithms
  * [x] DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
  * [x] 3DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
- * [ ] IDEA ([PAPER](http://www.isiweb.ee.ethz.ch/papers/arch/xlai-mass-inspec-1991-2.pdf))
+ * [x] IDEA ([PAPER](http://www.isiweb.ee.ethz.ch/papers/arch/xlai-mass-inspec-1991-2.pdf))
  * [ ] RC5
  * [x] AES (Rijndeal) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf))
    - [x] AES-128
