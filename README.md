@@ -76,7 +76,8 @@ The core module contains implementation of various cryptographic primitives.
  * [x] DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
  * [x] 3DES ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-67r1.pdf))
  * [x] IDEA ([PAPER](http://www.isiweb.ee.ethz.ch/papers/arch/xlai-mass-inspec-1991-2.pdf))
- * [ ] RC5
+ * [ ] RC5 ([RFC2040](https://tools.ietf.org/html/rfc2040))
+ * [ ] RC6 ([PAPER](http://people.csail.mit.edu/rivest/pubs/RRSY98.pdf))
  * [x] AES (Rijndeal) ([NIST](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf))
    - [x] AES-128
    - [x] AES-192
