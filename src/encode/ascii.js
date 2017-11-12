@@ -7,4 +7,7 @@ export const AsciiEncoder = {
   decode: str => Uint8Array.from(str.split('').map(i => i.charCodeAt(0))),
 };
 
+export const encode = AsciiEncoder.encode;
+export const decode = AsciiEncoder.decode;
+
 export default AsciiEncoder;

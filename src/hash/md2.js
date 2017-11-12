@@ -21,6 +21,7 @@ const S = [
 
 export class MD2Hash extends Hash {
 
+  static name = 'md2';
 
   init() {
     this.clean = true;

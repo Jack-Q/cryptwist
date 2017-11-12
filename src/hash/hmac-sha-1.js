@@ -6,6 +6,8 @@ import { SHA1Hash } from './sha-1';
 const blockLength = 64;
 export class HmacSHA1 extends Hmac {
 
+  static name = 'hmac-sha1';
+
   constructor(key) {
     super(new SHA1Hash(), blockLength, key);
   }

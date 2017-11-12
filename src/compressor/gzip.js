@@ -72,6 +72,9 @@ const parseFlag = f => ({
 });
 
 export class GzipCompressor {
+
+  static name = 'gzip';
+
   /**
    * @param {Uint8Array} msg
    */

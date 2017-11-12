@@ -108,6 +108,8 @@ const ideaCore = (msg, key) => {
 
 export class IDEABlockCipher extends BlockCipher {
 
+  static name = 'des-192';
+
   constructor(key) {
     super(key);
 

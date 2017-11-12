@@ -1,6 +1,9 @@
 import { Keccak } from './keccak/keccak';
 
 export class SHAKE128Hash extends Keccak {
+
+  static name = 'shake-128';
+
   constructor(d) {
     if (d === undefined) { throw 'SHAKE extendable output function (XOF) requires an parameter specifying the output length'; }
     super(SHAKE128Hash, 'SHAKE128', 256, d);

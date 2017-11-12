@@ -1,7 +1,15 @@
-import Encoder from './encode';
+import encoder from './encode';
+import compressor from './compressor';
+import blockCipher from './block-cipher';
+import streamCipher from './stream-cipher';
+import hash from './hash';
 
-const Core = {
-  Encoder,
+export const cryptwist = {
+  encoder,
+  compressor,
+  blockCipher,
+  streamCipher,
+  hash,
 };
 
-export default Core;
+export default cryptwist;

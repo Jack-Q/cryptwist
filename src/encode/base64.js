@@ -15,7 +15,7 @@ const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 /**
  * @argument array Uint8Array
  */
-const encode = (arr, len = arr.length, offset = 0) => {
+export const encode = (arr, len = arr.length, offset = 0) => {
   if (!(arr instanceof Uint8Array)) {
     console.warn('array to be encoded ought to be Uint8Array');
   }
@@ -34,7 +34,7 @@ const encode = (arr, len = arr.length, offset = 0) => {
     .substr(0, 4 * sec - pad) + alphabet[64].repeat(pad);
 };
 
-const decode = (str = '') => {
+export const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
@@ -74,7 +74,7 @@ const decode = (str = '') => {
   }).reduce((a, b) => a.concat(b)).slice(0, len));
 };
 
-const Base64Encoder = {
+export const Base64Encoder = {
   name: encoderName,
   encode,
   decode,

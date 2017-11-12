@@ -1,4 +1,4 @@
-import Base64Encoder from './base64';
+import { Base64Encoder } from './base64';
 
 const encoderName = 'Ascii Armored';
 
@@ -24,7 +24,7 @@ const crc24Check = (arr, len = arr.length, offset = 0) => {
 /**
  * @argument array Uint8Array
  */
-const encode = (arr, len = arr.length, offset = 0) => {
+export const encode = (arr, len = arr.length, offset = 0) => {
   if (!(arr instanceof Uint8Array)) {
     console.warn('array to be encoded ought to be Uint8Array');
   }
@@ -35,7 +35,7 @@ const encode = (arr, len = arr.length, offset = 0) => {
   return `${content}\n=${crc}`;
 };
 
-const decode = (str = '') => {
+export const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
@@ -52,7 +52,7 @@ const decode = (str = '') => {
   return content;
 };
 
-const AsciiArmoredEncoder = {
+export const AsciiArmoredEncoder = {
   name: encoderName,
   encode,
   decode,

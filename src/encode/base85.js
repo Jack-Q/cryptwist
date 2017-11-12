@@ -7,7 +7,7 @@ const alphabet = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\
 /**
  * @argument array Uint8Array
  */
-const encode = (arr, len = arr.length, offset = 0) => {
+export const encode = (arr, len = arr.length, offset = 0) => {
   if (!(arr instanceof Uint8Array)) {
     console.warn('array to be encoded ought to be Uint8Array');
   }
@@ -37,7 +37,7 @@ const encode = (arr, len = arr.length, offset = 0) => {
   return `<~${str.substr(0, str.length - pad)}~>`;
 };
 
-const decode = (str = '') => {
+export const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
@@ -79,7 +79,7 @@ const decode = (str = '') => {
   return Uint8Array.from(data.slice(0, data.length - pad));
 };
 
-const Base85Encoder = {
+export const Base85Encoder = {
   name: encoderName,
   encode,
   decode,

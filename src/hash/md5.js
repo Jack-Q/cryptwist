@@ -80,6 +80,8 @@ const md5MainLoop = (state, buffer) => {
 
 export class MD5Hash extends MD4HashBase {
 
+  static name = 'md5';
+
   constructor() {
     super(MD5Hash, 'MD5');
   }

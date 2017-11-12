@@ -28,7 +28,7 @@ const paddingCountSet = [0, 6, 4, 3, 1, 0];
 /**
  * @argument array Uint8Array
  */
-const encode = (arr, len = arr.length, offset = 0) => {
+export const encode = (arr, len = arr.length, offset = 0) => {
   if (!(arr instanceof Uint8Array)) {
     console.warn('array to be encoded ought to be Uint8Array');
   }
@@ -51,7 +51,7 @@ const encode = (arr, len = arr.length, offset = 0) => {
     .substr(0, 8 * sec - pad) + alphabet[32].repeat(pad);
 };
 
-const decode = (str = '') => {
+export const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
@@ -99,7 +99,7 @@ const decode = (str = '') => {
   }).reduce((a, b) => a.concat(b)).slice(0, len));
 };
 
-const Base32Encoder = {
+export const Base32Encoder = {
   name: encoderName,
   encode,
   decode,
@@ -107,19 +107,3 @@ const Base32Encoder = {
 };
 
 export default Base32Encoder;
-
-// const test = (msg) => {
-//   console.log("testing: " + msg)
-//   const enc = encode(msg)
-//   console.log("encoded: " + enc)
-//   const dec = decode(enc)
-//   console.log("decoded: " + dec)
-// }
-
-// test(Uint8Array.from([112]))
-// test(Uint8Array.from([112, 213]))
-// test(Uint8Array.from([112, 132, 122]))
-// test(Uint8Array.from([112, 142, 221, 229]))
-// test(Uint8Array.from([112, 207, 122, 119, 187]))
-// test(Uint8Array.from([112, 111, 222, 098, 090, 012]))
-// test(Uint8Array.from("HelloWorldJmnopqrstuvwxyz@".split('').map(s => s.charCodeAt(0))))

@@ -9,8 +9,10 @@ const initState = Uint32Array.of(
 
 export class SHA224Hash extends MD4HashBase {
 
+  static name = 'sha-224';
+
   constructor() {
-    super(SHA224Hash, 'SHA-256', 'BE');
+    super(SHA224Hash, 'SHA-224', 'BE');
   }
 
   mainLoop() {

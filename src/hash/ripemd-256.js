@@ -119,6 +119,8 @@ const ripemd256MainLoop = (state, buffer) => {
 
 export class RIPEMD256Hash extends MD4HashBase {
 
+  static name = 'ripemd-256';
+
   constructor() {
     super(RIPEMD256Hash, 'RIPEMD-256');
   }

@@ -86,6 +86,8 @@ export function* prga(stateArray) {
 }
 
 export class RC4StreamCipher extends StreamCipher {
+  static name = CIPHER_NAME;
+
   get stream() {
     return prga(ksa(this.key));
   }

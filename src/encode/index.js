@@ -1,19 +1,19 @@
-import Base64Encoder from './base64';
-import Base32Encoder from './base32';
-import Base16Encoder from './base16';
-import Base85Encoder from './base85';
-import HexEncoder from './hex';
-import AsciiArmoredEncoder from './ascii-armored';
-import AsciiEncoder from './ascii';
+import { Base64Encoder } from './base64';
+import { Base32Encoder } from './base32';
+import { Base16Encoder } from './base16';
+import { Base85Encoder } from './base85';
+import { HexEncoder } from './hex';
+import { AsciiArmoredEncoder } from './ascii-armored';
+import { AsciiEncoder } from './ascii';
 
-const encoders = [
+const encoderList = [
   Base16Encoder, Base32Encoder,
   Base64Encoder, Base85Encoder,
   AsciiArmoredEncoder, HexEncoder,
   AsciiEncoder,
 ];
 
-const getEncoder = name => encoders.find(i => i.name === name);
+const getEncoder = name => encoderList.find(i => i.name === name);
 
 const Encoder = {
   Base64Encoder,
@@ -23,8 +23,8 @@ const Encoder = {
   HexEncoder,
   AsciiArmoredEncoder,
   AsciiEncoder,
-  encoders,
 
+  encoderList,
   getEncoder,
 };
 
@@ -35,5 +35,5 @@ export { Base85Encoder } from './base85';
 export { HexEncoder } from './hex';
 export { AsciiArmoredEncoder } from './ascii-armored';
 export { AsciiEncoder } from './ascii';
-export { getEncoder, encoders };
+export { getEncoder, encoderList, Encoder };
 export default Encoder;

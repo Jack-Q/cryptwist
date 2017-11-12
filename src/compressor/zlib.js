@@ -21,6 +21,8 @@ const compressionLevel = {
 };
 
 export class ZlibCompressor {
+  static name = 'zlib';
+
   /**
    * @param {Uint8Array} msg
    */

@@ -1,6 +1,9 @@
 import { Keccak } from './keccak/keccak';
 
 export class SHA3_384Hash extends Keccak {
+
+  static name = 'sha3-384';
+
   constructor() {
     super(SHA3_384Hash, 'SHA3-256', 768, 384);
   }

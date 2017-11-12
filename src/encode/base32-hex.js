@@ -7,9 +7,9 @@ const hexAlphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUV=';
 /**
  * @argument array Uint8Array
  */
-const encode = (arr, len = arr.length, offset = 0) => Base32.encode(arr, len, offset).split('').map(c => hexAlphabet[Base32.alphabet.indexOf(c)]).join('');
+export const encode = (arr, len = arr.length, offset = 0) => Base32.encode(arr, len, offset).split('').map(c => hexAlphabet[Base32.alphabet.indexOf(c)]).join('');
 
-const decode = (str = '') => {
+export const decode = (str = '') => {
   if (typeof str !== 'string') {
     console.warn('message to be decoded ought to be string');
   }
@@ -29,7 +29,7 @@ const decode = (str = '') => {
   }).join(''));
 };
 
-const Base32Hex = {
+export const Base32Hex = {
   name: encoderName,
   encode,
   decode,

@@ -2,14 +2,25 @@
   "name": "cryptwist",
   "version": "0.1.0",
   "description": "Cryptographic Primitive Implementation for illustration",
-  "author": "Jack Q <QiaoBo@outlook.com>",
+  "keywords": [
+    "cryptography",
+    "encryption",
+    "hash",
+    "decryption",
+    "digest"
+  ],
+  "author": "Jack Q <QiaoBo@outlook.com> (https://jack-q.github.io/blog/)",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "files": [
+    "lib"
+  ],
   "scripts": {
-    "build": "cross-env BABEL_ENV=production babel src -d lib --ignore spec.js,test.js",
+    "build": "cross-env BABEL_ENV=production babel src -d lib --ignore spec.js,test.js,test-util.js",
     "lint": "eslint --ext .js src",
     "test": "jest"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-eslint": "^7.1.1",
@@ -33,5 +44,16 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jack-Q/cryptwist.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jack-Q/cryptwist/issues"
+  },
+  "homepage": "https://github.com/Jack-Q/cryptwist#readme"
 }
