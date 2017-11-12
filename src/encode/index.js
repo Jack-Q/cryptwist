@@ -13,7 +13,7 @@ const encoderList = [
   AsciiEncoder,
 ];
 
-const getEncoder = name => encoderList.find(i => i.name === name);
+const getEncoder = title => encoderList.find(i => i.title === title);
 
 const Encoder = {
   Base64Encoder,

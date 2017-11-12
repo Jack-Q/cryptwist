@@ -11,7 +11,7 @@ const initState = Uint32Array.of(
 
 export class SHA512Hash extends MD4HashBase {
 
-  static name = 'sha-512';
+  static title = 'sha-512';
 
   constructor() {
     super(SHA512Hash, 'SHA-512', 'BE', true);

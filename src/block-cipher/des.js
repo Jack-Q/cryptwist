@@ -28,7 +28,7 @@ const desCore = (data, subKey) => {
 
 export class DESBlockCipher extends BlockCipher {
 
-  static name = 'des-192';
+  static title = 'des-192';
 
   constructor(key) {
     super(key);

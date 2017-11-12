@@ -53,7 +53,7 @@ export const decode = (str = '') => {
 };
 
 export const AsciiArmoredEncoder = {
-  name: encoderName,
+  title: encoderName,
   encode,
   decode,
 };

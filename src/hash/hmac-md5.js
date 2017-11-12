@@ -6,7 +6,7 @@ import { MD5Hash } from './md5';
 const blockLength = 64;
 export class HmacMD5 extends Hmac {
 
-  static name = 'hmac-md5';
+  static title = 'hmac-md5';
 
   constructor(key) {
     super(new MD5Hash(), blockLength, key);

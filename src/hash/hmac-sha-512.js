@@ -5,7 +5,7 @@ import { SHA512Hash } from './sha-512';
 const blockLength = 128;
 export class HmacSHA512 extends Hmac {
 
-  static name = 'hmac-sha512';
+  static title = 'hmac-sha512';
 
   constructor(key) {
     super(new SHA512Hash(), blockLength, key);

@@ -1,5 +1,5 @@
 import TestEncoder from './encode.test-util';
-import { Base16 } from './base16';
+import { Base16Encoder } from './base16';
 
 
 const cases = [
@@ -14,8 +14,8 @@ const cases = [
   ['foobar', '666F6F626172'],
 ];
 
-TestEncoder(Base16, cases);
+TestEncoder(Base16Encoder, cases);
 
 // other failure cases
-it('should refuse to decode', () => expect(Base16.decode()).toEqual(Uint8Array.from([])));
-it('should refuse to decode', () => expect(() => Base16.decode('A')).toThrowError(/invalid length of str/));
+it('should refuse to decode', () => expect(Base16Encoder.decode()).toEqual(Uint8Array.from([])));
+it('should refuse to decode', () => expect(() => Base16Encoder.decode('A')).toThrowError(/invalid length of str/));

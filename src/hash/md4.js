@@ -60,7 +60,7 @@ const md4MainLoop = (state, buffer) => {
 
 export class MD4Hash extends MD4HashBase {
 
-  static name = 'md4';
+  static title = 'md4';
 
   constructor() {
     super(MD4Hash, 'MD4');

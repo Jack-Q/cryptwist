@@ -3,7 +3,7 @@ import { Inflate } from './deflate-impl/inflate';
 import { Deflate, DeflateOption } from './deflate-impl/deflate';
 
 export class DeflateCompressor {
-  static name = 'Deflate';
+  static title = 'Deflate';
 
   /**
    * @param {Uint8Array} msg

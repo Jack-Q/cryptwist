@@ -7,7 +7,7 @@ beforeEach(() => {
 const rnd = n => Array(n).fill(0).map(() => Math.floor(255 * Math.random()));
 
 const testEncoderObject = (encoder) => {
-  it('should has name property', () => expect(typeof encoder.name).toBe('string'));
+  it('should has title property', () => expect(typeof encoder.title).toBe('string'));
   it('should contain encode method', () => expect(typeof encoder.encode).toBe('function'));
   it('should contain decode method', () => expect(typeof encoder.decode).toBe('function'));
 };

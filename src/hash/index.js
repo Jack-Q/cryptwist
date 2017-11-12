@@ -58,7 +58,7 @@ const hashList = [
   SHAKE256Hash,
 ];
 
-const getHash = name => hashList.find(i => i.name === name);
+const getHash = title => hashList.find(i => i.title === title);
 
 const Hash = {
   Hmac,

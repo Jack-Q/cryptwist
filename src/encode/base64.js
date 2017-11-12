@@ -75,7 +75,7 @@ export const decode = (str = '') => {
 };
 
 export const Base64Encoder = {
-  name: encoderName,
+  title: encoderName,
   encode,
   decode,
 };

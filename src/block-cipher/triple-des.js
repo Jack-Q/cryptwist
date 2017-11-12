@@ -34,7 +34,7 @@ export const checkKey = (key) => {
 
 export class TripleDESBlockCipher extends BlockCipher {
 
-  static name = 'triple-des';
+  static title = 'triple-des';
 
   constructor(key) {
     super(key);

@@ -1,5 +1,5 @@
 import TestEncoder from './encode.test-util';
-import { Base32 } from './base32';
+import { Base32Encoder } from './base32';
 
 
 const cases = [
@@ -16,14 +16,14 @@ const cases = [
 
 ];
 
-TestEncoder(Base32, cases);
+TestEncoder(Base32Encoder, cases);
 
 // other failure cases
-it('should refuse to decode', () => expect(Base32.decode()).toEqual(Uint8Array.from([])));
-it('should refuse to decode', () => expect(() => Base32.decode('1212')).toThrowError(/invalid length of str/));
-it('should refuse to decode', () => expect(() => Base32.decode('2=======')).toThrowError(/padding/));
-it('should refuse to decode', () => expect(() => Base32.decode('321=====')).toThrowError(/padding/));
-it('should refuse to decode', () => expect(() => Base32.decode('321ACB==')).toThrowError(/padding/));
-it('should refuse to decode', () => expect(() => Base32.decode('321ACB=A')).toThrowError(/unexpected/));
-it('should refuse to decode', () => expect(() => Base32.decode('as123===')).toThrowError(/unexpected/));
-it('should refuse to decode', () => expect(() => Base32.decode('%$%$====')).toThrowError(/unexpected/));
+it('should refuse to decode', () => expect(Base32Encoder.decode()).toEqual(Uint8Array.from([])));
+it('should refuse to decode', () => expect(() => Base32Encoder.decode('1212')).toThrowError(/invalid length of str/));
+it('should refuse to decode', () => expect(() => Base32Encoder.decode('2=======')).toThrowError(/padding/));
+it('should refuse to decode', () => expect(() => Base32Encoder.decode('321=====')).toThrowError(/padding/));
+it('should refuse to decode', () => expect(() => Base32Encoder.decode('321ACB==')).toThrowError(/padding/));
+it('should refuse to decode', () => expect(() => Base32Encoder.decode('321ACB=A')).toThrowError(/unexpected/));
+it('should refuse to decode', () => expect(() => Base32Encoder.decode('as123===')).toThrowError(/unexpected/));
+it('should refuse to decode', () => expect(() => Base32Encoder.decode('%$%$====')).toThrowError(/unexpected/));

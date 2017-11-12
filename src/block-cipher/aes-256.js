@@ -16,7 +16,7 @@ import { encrypt, decrypt, expandKey } from './rijndael/core';
 
 export class AES256BlockCipher extends BlockCipher {
 
-  static name = 'aes-256';
+  static title = 'aes-256';
 
   constructor(key) {
     super(key);

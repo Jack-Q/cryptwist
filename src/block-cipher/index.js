@@ -14,7 +14,7 @@ const blockCipherList = [
   IDEABlockCipher,
 ];
 
-const getBlockCipher = name => blockCipherList.find(i => i.name === name);
+const getBlockCipher = title => blockCipherList.find(i => i.title === title);
 
 const BlockCipher = {
   AES128BlockCipher,

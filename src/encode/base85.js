@@ -80,7 +80,7 @@ export const decode = (str = '') => {
 };
 
 export const Base85Encoder = {
-  name: encoderName,
+  title: encoderName,
   encode,
   decode,
 };

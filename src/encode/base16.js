@@ -29,7 +29,7 @@ export const decode = (str = '') => {
 };
 
 export const Base16Encoder = {
-  name: encoderName,
+  title: encoderName,
   encode,
   decode,
 };

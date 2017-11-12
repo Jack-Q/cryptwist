@@ -2,7 +2,7 @@ import { RC4StreamCipher } from './rc4';
 
 const streamCipherList = [RC4StreamCipher];
 
-const getStreamCipher = name => streamCipherList.find(i => i.name === name);
+const getStreamCipher = title => streamCipherList.find(i => i.title === title);
 
 const StreamCipher = {
   RC4StreamCipher,

@@ -6,7 +6,7 @@ const oPadding = 0x5c;
 
 export class Hmac extends Hash {
 
-  static name = 'hmac';
+  static title = 'hmac';
 
   init(hashInst, blockLength, key) {
     this.key = key;

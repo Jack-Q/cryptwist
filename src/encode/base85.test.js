@@ -1,5 +1,5 @@
 import TestEncoder from './encode.test-util';
-import { Base85 } from './base85';
+import { Base85Encoder } from './base85';
 
 
 const cases = [
@@ -36,12 +36,12 @@ const cases = [
   ],
 ];
 
-TestEncoder(Base85, cases);
+TestEncoder(Base85Encoder, cases);
 
 // other failure cases
-it('should refuse to decode', () => expect(() => Base85.decode('<~!~>')).toThrowError(/invalid length of str/));
-it('should refuse to decode', () => expect(() => Base85.decode('<~\0\0~>')).toThrowError(/unresolved content section/));
-it('should refuse to decode', () => expect(() => Base85.decode('<~xyz~>')).toThrowError(/unresolved content section .* at/));
-it('should refuse to decode', () => expect(() => Base85.decode('<~uu~>')).toThrowError(/unresolved content section/));
-it('should refuse to decode', () => expect(() => Base85.decode()).toThrowError(/invalid length of str/));
-it('should refuse to decode', () => expect(() => Base85.decode('uuuu')).toThrowError(/be wrapped into/));
+it('should refuse to decode', () => expect(() => Base85Encoder.decode('<~!~>')).toThrowError(/invalid length of str/));
+it('should refuse to decode', () => expect(() => Base85Encoder.decode('<~\0\0~>')).toThrowError(/unresolved content section/));
+it('should refuse to decode', () => expect(() => Base85Encoder.decode('<~xyz~>')).toThrowError(/unresolved content section .* at/));
+it('should refuse to decode', () => expect(() => Base85Encoder.decode('<~uu~>')).toThrowError(/unresolved content section/));
+it('should refuse to decode', () => expect(() => Base85Encoder.decode()).toThrowError(/invalid length of str/));
+it('should refuse to decode', () => expect(() => Base85Encoder.decode('uuuu')).toThrowError(/be wrapped into/));

@@ -100,7 +100,7 @@ export const decode = (str = '') => {
 };
 
 export const Base32Encoder = {
-  name: encoderName,
+  title: encoderName,
   encode,
   decode,
   alphabet,

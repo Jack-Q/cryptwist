@@ -8,7 +8,7 @@ const compressorList = [
   GzipCompressor,
 ];
 
-const getCompressor = name => compressorList.find(i => i.name === name);
+const getCompressor = title => compressorList.find(i => i.title === title);
 
 const Compressor = {
   DeflateCompressor,
