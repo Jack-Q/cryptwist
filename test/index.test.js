@@ -13,7 +13,7 @@ const encodeMessage = Uint8Array.of(0, 1, 2, 3, 4, 5, 6, 7, 8);
 cryptwist.encoder.encoderList.forEach((encoderClass) => {
   const name = encoderClass.title;
   it('should report its name', () => expect(typeof name === 'string' && name.length > 0).toBe(true));
-  it('should encode and decode message', () =>
+  it(`should encode and decode message for ${name}`, () =>
     expect(encoderClass.decode(encoderClass.encode(encodeMessage))).toEqual(encodeMessage));
 });
 cryptwist.hash.hashList.forEach((hashClass) => {
