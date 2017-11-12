@@ -1,5 +1,5 @@
 import TestEncoder from './encode.test-util';
-import Base64 from './base64';
+import { Base64 } from './base64';
 
 const cases = [
   ['Hello', 'SGVsbG8='],

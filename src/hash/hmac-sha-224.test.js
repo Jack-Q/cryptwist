@@ -1,5 +1,5 @@
 import { HmacSHA224 } from './hmac-sha-224';
-import Encoder from '../encode';
+import { Encoder } from '../encode';
 
 const { decode, encode } = Encoder.HexEncoder;
 const { decode: fromStr } = Encoder.AsciiEncoder;

@@ -1,6 +1,6 @@
 import { TripleDESBlockCipher } from './triple-des';
 
-import Encoder from '../encode';
+import { Encoder } from '../encode';
 
 const { encode, decode } = Encoder.Base16Encoder;
 const msg = decode('5468652071756663');

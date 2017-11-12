@@ -1,5 +1,5 @@
 import TestEncoder from './encode.test-util';
-import Base16 from './base16';
+import { Base16 } from './base16';
 
 
 const cases = [

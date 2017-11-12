@@ -1,4 +1,4 @@
-import { SHA3_512Hash } from './sha3-512';
+import { SHA3_512Hash } from './sha3-512'; // eslint-disable-line camelcase
 import Encode from '../encode';
 
 const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(

@@ -15,7 +15,7 @@ export const checkKey = (key) => {
   } else if (key instanceof Uint8Array) {
     if (key.length === 64 || key.length === 56) {
       console.warn('using 1 key for Triple-DES is the same as DES while the latter is more efficient');
-      return Array(3).fill(0).map(_ => Uint8Array.from(key));
+      return Array(3).fill(0).map(() => Uint8Array.from(key));
     }
     if (key.length === 128 || key.length === 112) {
       return key.length === 128 ?

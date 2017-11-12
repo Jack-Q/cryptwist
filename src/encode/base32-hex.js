@@ -1,4 +1,4 @@
-import Base32 from './base32';
+import { Base32 } from './base32';
 
 const encoderName = 'Base32-Hex';
 
@@ -7,7 +7,8 @@ const hexAlphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUV=';
 /**
  * @argument array Uint8Array
  */
-export const encode = (arr, len = arr.length, offset = 0) => Base32.encode(arr, len, offset).split('').map(c => hexAlphabet[Base32.alphabet.indexOf(c)]).join('');
+export const encode = (arr, len = arr.length, offset = 0) =>
+  Base32.encode(arr, len, offset).split('').map(c => hexAlphabet[Base32.alphabet.indexOf(c)]).join('');
 
 export const decode = (str = '') => {
   if (typeof str !== 'string') {

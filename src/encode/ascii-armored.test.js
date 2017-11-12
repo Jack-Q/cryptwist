@@ -1,5 +1,5 @@
 import TestEncoder from './encode.test-util';
-import AsciiArmored from './ascii-armored';
+import { AsciiArmored } from './ascii-armored';
 
 
 const cases = [

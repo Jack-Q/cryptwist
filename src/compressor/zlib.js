@@ -13,7 +13,7 @@ const CM_DEFLATE = 8;
 const C_INFO_DEFLATE_32K = 7; // 32KB window size for DEFLATE algorithm
 const FLG_DICT_ON = 1;
 const FLG_DICT_OFF = 0;
-const compressionLevel = {
+const COMPRESSION_LEVEL = {
   fastest: 0,
   fast: 1,
   default: 2,
@@ -71,7 +71,11 @@ export class ZlibCompressor {
     if (Adler32Checksum.getCheck(data) !== dataChecksum) {
       console.log(Adler32Checksum.getCheck(data));
       console.log(dataChecksum);
-      throw `data checksum mismatch, data might be corrupted ${dataChecksum.toString(16)} ${Adler32Checksum.getCheck(data).toString(16)}`;
+      throw `data checksum mismatch, data might be corrupted ${
+        dataChecksum.toString(16)
+      } ${
+        Adler32Checksum.getCheck(data).toString(16)
+      }`;
     }
 
     return data;
@@ -83,7 +87,7 @@ export class ZlibCompressor {
    *
    * @param {Uint8Array} msg Message to be compressed
    */
-  static compress(msg, level = compressionLevel.default) {
+  static compress(msg, level = COMPRESSION_LEVEL.default) {
     const cmf = CM_DEFLATE | (C_INFO_DEFLATE_32K << 4);
     const flag = (level << 6) | (FLG_DICT_OFF << 5);
     const flagChk = flag + 31 - (cmf * 256 + flag) % 31; // add header checksum

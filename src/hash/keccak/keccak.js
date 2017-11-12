@@ -8,8 +8,12 @@ export class Keccak extends Sponge {
 
   constructor(HashClass, name, capacity, len, ...params) {
     super(HashClass, name, KECCAK_B, KECCAK_B - capacity, len, ...params);
-    this.paddingFirst = 0b00000110; // two bits domain separation bits "01" + first padding bit "1" (reverse order)
-    this.paddingLast = 0b10000000; // last padding bit "1" (reverse order)
+
+    // two bits domain separation bits "01" + first padding bit "1" (reverse order)
+    this.paddingFirst = 0b00000110;
+
+    // last padding bit "1" (reverse order)
+    this.paddingLast = 0b10000000;
   }
 
   func() {

@@ -1,5 +1,5 @@
-import { prga, ksa, RC4StreamCipher } from './rc4';
-import Encoder from '../encode/index';
+import { RC4StreamCipher } from './rc4';
+import { Encoder } from '../encode/index';
 
 const { Base64Encoder: Base64 } = Encoder;
 

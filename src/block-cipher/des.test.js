@@ -1,5 +1,5 @@
 import { DESBlockCipher } from './des';
-import Encoder from '../encode';
+import { Encoder } from '../encode';
 
 const { encode, decode } = Encoder.Base16Encoder;
 

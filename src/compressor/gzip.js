@@ -97,7 +97,9 @@ export class GzipCompressor {
 
     const flag = parseFlag(msg[pos++]);
 
-    const modifiedAt = new Date((msg[pos++] | msg[pos++] << 8 | msg[pos++] << 16 | msg[pos++] << 24) * 1000);
+    const modifiedAt = new Date(
+      (msg[pos++] | msg[pos++] << 8 | msg[pos++] << 16 | msg[pos++] << 24)
+      * 1000);
     if (modifiedAt.getTime() > 0) {
       console.log(`[GZIP] this message is generated at ${modifiedAt}`);
     }
@@ -166,9 +168,13 @@ export class GzipCompressor {
 
   static compress(msg, option = { fileName: '', headerCRC: true, comment: '' }) {
     // check option
-    const fileName = typeof option.fileName === 'string' && option.fileName.length > 0 ? AsciiEncoder.decode(option.name) : [];
-    const comment = typeof option.comment === 'string' && option.comment.length > 0 ? AsciiEncoder.decode(option.comment) : [];
-    const isHeaderCRC = fileName.headerCRC === false; // enable by default, unless disabled explicitly
+    const fileName = typeof option.fileName === 'string' && option.fileName.length > 0 ?
+      AsciiEncoder.decode(option.name) : [];
+    const comment = typeof option.comment === 'string' && option.comment.length > 0 ?
+      AsciiEncoder.decode(option.comment) : [];
+
+    // enable by default, unless disabled explicitly
+    const isHeaderCRC = fileName.headerCRC === false;
 
     const compressionData = DeflateCompressor.compress(msg);
     const buffer = new Uint8Array(

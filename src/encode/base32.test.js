@@ -1,5 +1,5 @@
 import TestEncoder from './encode.test-util';
-import Base32 from './base32';
+import { Base32 } from './base32';
 
 
 const cases = [

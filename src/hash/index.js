@@ -20,10 +20,10 @@ import { SHA512Hash } from './sha-512';
 import { SHA512t224Hash } from './sha-512-224';
 import { SHA512t256Hash } from './sha-512-256';
 import { SHA512THash } from './sha-512-t';
-import { SHA3_224Hash } from './sha3-224';
-import { SHA3_256Hash } from './sha3-256';
-import { SHA3_384Hash } from './sha3-384';
-import { SHA3_512Hash } from './sha3-512';
+import { SHA3_224Hash } from './sha3-224'; // eslint-disable-line camelcase
+import { SHA3_256Hash } from './sha3-256'; // eslint-disable-line camelcase
+import { SHA3_384Hash } from './sha3-384'; // eslint-disable-line camelcase
+import { SHA3_512Hash } from './sha3-512'; // eslint-disable-line camelcase
 import { SHAKE128Hash } from './shake-128';
 import { SHAKE256Hash } from './shake-256';
 
@@ -50,10 +50,10 @@ const hashList = [
   SHA512t224Hash,
   SHA512t256Hash,
   SHA512THash,
-  SHA3_224Hash,
-  SHA3_256Hash,
-  SHA3_384Hash,
-  SHA3_512Hash,
+  SHA3_224Hash, // eslint-disable-line camelcase
+  SHA3_256Hash, // eslint-disable-line camelcase
+  SHA3_384Hash, // eslint-disable-line camelcase
+  SHA3_512Hash, // eslint-disable-line camelcase
   SHAKE128Hash,
   SHAKE256Hash,
 ];
@@ -83,10 +83,10 @@ const Hash = {
   SHA512t224Hash,
   SHA512t256Hash,
   SHA512THash,
-  SHA3_224Hash,
-  SHA3_256Hash,
-  SHA3_384Hash,
-  SHA3_512Hash,
+  SHA3_224Hash, // eslint-disable-line camelcase
+  SHA3_256Hash, // eslint-disable-line camelcase
+  SHA3_384Hash, // eslint-disable-line camelcase
+  SHA3_512Hash, // eslint-disable-line camelcase
   SHAKE128Hash,
   SHAKE256Hash,
 
@@ -117,10 +117,10 @@ export { SHA512Hash } from './sha-512';
 export { SHA512t224Hash } from './sha-512-224';
 export { SHA512t256Hash } from './sha-512-256';
 export { SHA512THash } from './sha-512-t';
-export { SHA3_224Hash } from './sha3-224';
-export { SHA3_256Hash } from './sha3-256';
-export { SHA3_384Hash } from './sha3-384';
-export { SHA3_512Hash } from './sha3-512';
+export { SHA3_224Hash } from './sha3-224'; // eslint-disable-line camelcase
+export { SHA3_256Hash } from './sha3-256'; // eslint-disable-line camelcase
+export { SHA3_384Hash } from './sha3-384'; // eslint-disable-line camelcase
+export { SHA3_512Hash } from './sha3-512'; // eslint-disable-line camelcase
 export { SHAKE128Hash } from './shake-128';
 export { SHAKE256Hash } from './shake-256';
 export { getHash, hashList, Hash };

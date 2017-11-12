@@ -835,6 +835,26 @@ const messageScanLazyMatch = (ctx, isEnd) => {
       block.encodeBlock(out, msg, msg.curPos === msg.usePos ? isEnd : false);
     }
   };
+  const filter = p => curPos - p <= MAX_DISTANCE;
+  const candidateProcess = (candidate) => {
+    let pos = 0;
+    let len = 0;
+    candidate.map((p) => {
+      let l = 3;
+      while (msg.buf[p + l] === msg.buf[curPos + l]
+        && l < MAX_ENCODE_LEN
+        && curPos + l < termPos) l++;
+      return Math.min(l, termPos - curPos);
+    }).reduce((l, c, i) => {
+      if (c > l) {
+        pos = candidate[i];
+        len = c;
+        return c;
+      }
+      return l;
+    }, 0);
+    return { pos, len };
+  };
   while (curPos < loopEnd) {
     const ch = msg.buf[curPos];
     const chN = msg.buf[curPos + 1];
@@ -843,26 +863,10 @@ const messageScanLazyMatch = (ctx, isEnd) => {
     lastHash = hashTable.updateHashKey(lastHash, chNN);
     const candidate = hashTable
       .matchCandidate(lastHash, msg, ch, chN, chNN)
-      .filter(p => curPos - p <= MAX_DISTANCE);
+      .filter(filter);
 
     if (candidate.length > 0) {
-      let pos = 0;
-      let len = 0;
-      candidate.map((p) => {
-        let l = 3;
-        while (msg.buf[p + l] === msg.buf[curPos + l]
-          && l < MAX_ENCODE_LEN
-          && curPos + l < termPos) l++;
-        return Math.min(l, termPos - curPos);
-      }).reduce((l, c, i) => {
-        if (c > l) {
-          pos = candidate[i];
-          len = c;
-          return c;
-        }
-        return l;
-      }, 0);
-
+      const { pos, len } = candidateProcess(candidate);
       matchBuffer.push({ len, pos: curPos - pos, ch });
     } else if (matchBuffer.length === 0) {
       // emit literal
