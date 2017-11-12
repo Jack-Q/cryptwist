@@ -83,7 +83,7 @@ export function prga(stateArray) {
 
       const t = (stateArray[i] + stateArray[j]) % STATE_SIZE;
 
-      return { value: stateArray[t] };
+      return { value: stateArray[t], done: false };
     },
   };
 }
