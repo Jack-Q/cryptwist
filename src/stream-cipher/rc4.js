@@ -80,12 +80,12 @@ export function prga(stateArray) {
       i = (i + 1) % STATE_SIZE;
       j = (j + stateArray[i]) % STATE_SIZE;
       swap(stateArray, i, j);
-  
+
       const t = (stateArray[i] + stateArray[j]) % STATE_SIZE;
 
       return { value: stateArray[t] };
-    }
-  }
+    },
+  };
 }
 
 export class RC4StreamCipher extends StreamCipher {
