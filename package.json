@@ -1,6 +1,6 @@
 {
   "name": "cryptwist",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Cryptographic Primitive Implementation for illustration",
   "keywords": [
     "cryptography",
@@ -16,10 +16,11 @@
     "lib"
   ],
   "scripts": {
-    "build": "cross-env BABEL_ENV=production babel src -d lib --ignore spec.js,test.js,test-util.js",
+    "build": "rimraf -r lib && cross-env BABEL_ENV=production babel src -d lib --ignore spec.js,test.js,test-util.js",
     "lint": "eslint --ext .js src",
     "test": "npm run lint && jest",
-    "coveralls": "npm run test --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "coveralls": "npm run test --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "prepublish": "npm run build"
   },
   "dependencies": {},
   "devDependencies": {
@@ -36,7 +37,8 @@
     "eslint-loader": "^1.7.1",
     "eslint-plugin-html": "^3.2.2",
     "eslint-plugin-import": "^2.2.0",
-    "jest": "^21.2.0"
+    "jest": "^21.2.0",
+    "rimraf": "^2.6.2"
   },
   "engines": {
     "node": ">= 4.0.0",

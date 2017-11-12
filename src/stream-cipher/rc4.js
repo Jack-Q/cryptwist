@@ -71,17 +71,20 @@ export const ksa = (key) => {
  *
  * @param {Uint8Array} stateArray
  */
-export function* prga(stateArray) {
+export function prga(stateArray) {
   let i = 0;
   let j = 0;
-  //eslint-disable-next-line
-  while (true) {
-    i = (i + 1) % STATE_SIZE;
-    j = (j + stateArray[i]) % STATE_SIZE;
-    swap(stateArray, i, j);
 
-    const t = (stateArray[i] + stateArray[j]) % STATE_SIZE;
-    yield stateArray[t];
+  return {
+    next: () => {
+      i = (i + 1) % STATE_SIZE;
+      j = (j + stateArray[i]) % STATE_SIZE;
+      swap(stateArray, i, j);
+  
+      const t = (stateArray[i] + stateArray[j]) % STATE_SIZE;
+
+      return { value: stateArray[t] };
+    }
   }
 }
 
