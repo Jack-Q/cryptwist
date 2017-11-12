@@ -18,7 +18,8 @@
   "scripts": {
     "build": "cross-env BABEL_ENV=production babel src -d lib --ignore spec.js,test.js,test-util.js",
     "lint": "eslint --ext .js src",
-    "test": "jest"
+    "test": "npm run lint && jest",
+    "coveralls": "npm run test --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "dependencies": {},
   "devDependencies": {
@@ -28,6 +29,7 @@
     "babel-plugin-transform-runtime": "^6.22.0",
     "babel-preset-env": "^1.3.2",
     "babel-preset-stage-2": "^6.22.0",
+    "coveralls": "^3.0.0",
     "cross-env": "^5.1.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.1.3",
