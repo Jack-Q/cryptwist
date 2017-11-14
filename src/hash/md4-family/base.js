@@ -1,5 +1,6 @@
 import { Hash, TODO } from '../../base/api';
-import { Int64, Int128 } from '../../util/big-int';
+import { Int64 } from '../../util/int-64';
+import { Int128 } from '../../util/int-128';
 
 export class MD4HashBase extends Hash {
 

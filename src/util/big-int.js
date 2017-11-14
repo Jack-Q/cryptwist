@@ -1,130 +1,46 @@
-export class Int64 {
+import { parseBinString } from './big-int-impl/parse-bin-string';
 
-  constructor(number = 0) {
-    this.data = Uint32Array.of(0, 0, 0);
-    this.addNumberToLength(number);
+
+/**
+ * Big Integer with arbitrary precision
+ *
+ * In this implementation, the value of number is stored as array of JavaScript numbers internally
+ */
+export class BigInt {
+  constructor(value, radix = 10) {
+    this.positive = true;
+    this.arr = [0];
+
+    if (value === undefined) return;
+    if (typeof value === 'string') { this.parseString(value, radix); return; }
+    if (typeof value === 'number') { this.setNumber(value); return; }
+    if (typeof value === 'object' && value instanceof Uint8Array) { this.setBuffer(value); }
   }
 
   /**
-   * Use 3 32-bit number to simulate 64-bit number
-   * @param {Array<Number>} len length array to update
-   * @param {Number|Array<Number>} cur
+   * parse the value for a string representation
+   *
+   * @param {string} str string representation of integer
+   * @param {number} radix radix used in string, supporting 2 to 36
    */
-  addNumberToLength(cur) {
-    const arr = cur instanceof Int64 ? cur.data : [0, cur >>> 24, cur & 0xffffff];
-    let carry = 0;
-
-    this.data[2] += arr[2];
-    carry = this.data[2] >>> 24;
-    this.data[2] &= 0xffffff;
-
-    this.data[1] += arr[1] + carry;
-    carry = this.data[1] >>> 24;
-    this.data[1] &= 0xffffff;
-
-    this.data[0] += arr[0] + carry;
-    carry = this.data[1] >>> 24;
-    this.data[0] &= 0xffff;
-
-    return carry;
-  }
-
-  get loBytesLE() {
-    return Uint8Array.of(
-      this.data[2],
-      this.data[2] >>> 8,
-      this.data[2] >>> 16,
-      this.data[1],
-    );
-  }
-
-  get hiBytesLE() {
-    return Uint8Array.of(
-      this.data[1] >>> 8,
-      this.data[1] >>> 16,
-      this.data[0],
-      this.data[0] >>> 8,
-    );
-  }
-
-  get bytesLE() {
-    return Uint8Array.of(...this.loBytesLE, ...this.hiBytesLE);
-  }
-
-  get hiBytesBE() {
-    return Uint8Array.of(
-      this.data[0] >>> 8,
-      this.data[0],
-      this.data[1] >>> 16,
-      this.data[1] >>> 8,
-    );
-  }
-
-  get loBytesBE() {
-    return Uint8Array.of(
-      this.data[1],
-      this.data[2] >>> 16,
-      this.data[2] >>> 8,
-      this.data[2],
-    );
-  }
-
-  get bytesBE() {
-    return Uint8Array.of(...this.hiBytesBE, ...this.loBytesBE);
-  }
-
-  get val() {
-    return (this.data[0] & 0xffffff) * (2 ** 48) +
-      (this.data[1] & 0xffffff) * (2 ** 24) +
-      (this.data[2] & 0xffffff) * (2 ** 0);
-  }
-
-  set val(val) {
-    this.data.fill(0);
-    this.addNumberToLength(val);
-  }
-}
-
-export class Int128 {
-  constructor(number = 0) {
-    this.hi = new Int64();
-    this.lo = new Int64();
-    this.addNumberToLength(number);
-  }
-  addNumberToLength(number) {
-    if (typeof number === 'number') {
-      const lo = number % 0xffffffff;
-      const hi = Math.floor((number - lo) / 0xffffffff);
-      const carry = this.lo.addNumberToLength(lo);
-      return this.hi.addNumberToLength(hi) + this.hi.addNumberToLength(carry);
-    } else if (number instanceof Int128) {
-      const carry = this.lo.addNumberToLength(number.lo);
-      return this.hi.addNumberToLength(number.hi) + this.hi.addNumberToLength(carry);
-    } else if (number instanceof Int64) {
-      const carry = this.lo.addNumberToLength(number);
-      return this.hi.addNumberToLength(carry);
+  parseString(str, radix = 10) {
+    const s = str.replace(/\s|_|,/g, '').toLowerCase();
+    const binArr = parseBinString(s[0] === '-' ? s.slice(1) : s, radix);
+    if (binArr) {
+      this.arr = binArr;
+      if (s[0] === '-') this.positive = false;
+      return this;
     }
-    console.log('unknown typeof number');
-    return 0;
+    this.arr = [0];
+    return this;
   }
 
-  get bytesBE() {
-    return Uint8Array.of(...this.hi.bytesBE, ...this.lo.bytesBE);
-  }
-
-  get bytesLE() {
-    return Uint8Array.of(...this.lo.bytesLE, ...this.hi.bytesLE);
-  }
-
-  get val() {
-    return this.hi.val * (2 ** 64) + this.lo.val;
-  }
-  set val(val) {
-    const lo = val % 0xffffffff;
-    const hi = Math.floor((val - lo) / 0xffffffff);
-    this.hi.val = hi;
-    this.lo.val = lo;
+  toString(radix = 10) {
+    if (radix === 2) return this.arr.map(i => ('0'.repeat(16) + i.toString(2)).slice(-16)).reverse().join('').replace(/^0*/, '');
+    if (radix === 4) return this.arr.map(i => ('0'.repeat(8) + i.toString(4)).slice(-8)).reverse().join('').replace(/^0*/, '');
+    if (radix === 16) return this.arr.map(i => ('0'.repeat(4) + i.toString(16)).slice(-4)).reverse().join('').replace(/^0*/, '');
+    return '';
   }
 }
 
-export default { Int64, Int128 };
+export default BigInt;
