@@ -41,6 +41,31 @@ export class BigInt {
     if (radix === 16) return this.arr.map(i => ('0'.repeat(4) + i.toString(16)).slice(-4)).reverse().join('').replace(/^0*/, '');
     return '';
   }
+
+  add(val) {
+    const valArr = val instanceof BigInt ? val : new BigInt(val);
+    if (this.positive !== valArr.positive) return this.positive ? this.subtract(valArr) : valArr.subtract(this);
+
+    const newVal = new BigInt();
+    const len = Math.max(this.arr.length, valArr.arr.length);
+    let carry = 0;
+
+    newVal.positive = this.positive;
+    newVal.arr.splice(0);
+
+    for (let i = 0; i < len; i++) {
+      const v = this.arr[i] + newVal.arr[i] + carry;
+      carry = v >>> 16;
+      newVal.arr.push(v & 0xffff);
+    }
+
+    if (carry) newVal.push(carry);
+    return newVal;
+  }
+
+  subtract(val) {
+
+  }
 }
 
 export default BigInt;
