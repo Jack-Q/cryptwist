@@ -33,11 +33,11 @@ yarn add cryptwist
 
 ## Usage
 
-> TODO
+Please check the unit tests as reference for usage hints
 
 ## Supported components
 
-Check [components](./components.md) page for a detailed list about the 
+Check [components](./components.md) page for a detailed list about the
 supported and planned list of components.
 
 ---
