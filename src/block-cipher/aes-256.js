@@ -10,13 +10,14 @@
  * length: 32 bytes 256 bit
  */
 
-import { BlockCipher } from '../base/api';
+import { BlockCipher, BlockCipherMeta } from '../base/api';
 
 import { encrypt, decrypt, expandKey } from './rijndael/core';
 
 export class AES256BlockCipher extends BlockCipher {
 
-  static title = 'aes-256';
+  static meta = new BlockCipherMeta('aes-256', 32, 16);
+  static title = AES256BlockCipher.meta.title;
 
   constructor(key) {
     super(key);

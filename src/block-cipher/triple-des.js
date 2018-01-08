@@ -1,4 +1,4 @@
-import { BlockCipher } from '../base/api';
+import { BlockCipher, BlockCipherMeta } from '../base/api';
 
 import { DESBlockCipher } from './des';
 
@@ -34,7 +34,10 @@ export const checkKey = (key) => {
 
 export class TripleDESBlockCipher extends BlockCipher {
 
-  static title = 'triple-des';
+  // the key length can be onr of 56bit, 64bit, 112bit, 128bit, 168bit, 192bit
+  static meta = new BlockCipherMeta('triple-des', 128, 8);
+  static title = TripleDESBlockCipher.meta.title;
+
 
   constructor(key) {
     super(key);

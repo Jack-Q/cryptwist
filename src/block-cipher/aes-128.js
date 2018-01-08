@@ -10,13 +10,14 @@
  * length: 16 bytes 128 bit
  */
 
-import { BlockCipher } from '../base/api';
+import { BlockCipher, BlockCipherMeta } from '../base/api';
 
 import { encrypt, decrypt, expandKey } from './rijndael/core';
 
 export class AES128BlockCipher extends BlockCipher {
 
-  static title = 'aes-128';
+  static meta = new BlockCipherMeta('aes-128', 16, 16);
+  static title = AES128BlockCipher.meta.title;
 
   constructor(key) {
     super(key);

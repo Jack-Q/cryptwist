@@ -9,7 +9,7 @@
  * length: 8 bytes 64 bit, with parity check
  */
 
-import { BlockCipher } from '../base/api';
+import { BlockCipher, BlockCipherMeta } from '../base/api';
 
 import { generateSubKey } from './des-impl/sub-key';
 import { initialPermute, finalPermute } from './des-impl/perm';
@@ -28,7 +28,8 @@ const desCore = (data, subKey) => {
 
 export class DESBlockCipher extends BlockCipher {
 
-  static title = 'des-192';
+  static meta = new BlockCipherMeta('des-192', 8, 8);
+  static title = DESBlockCipher.meta.title;
 
   constructor(key) {
     super(key);

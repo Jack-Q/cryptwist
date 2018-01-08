@@ -21,6 +21,19 @@ export class BlockCipher {
   decrypt(cipher) { return TODO([this, cipher]); }
 }
 
+export class BlockCipherMeta {
+  /**
+   * @param {string} title title of block cipher
+   * @param {number} keySize block size in byte
+   * @param {number} blockSize block size in byte
+   */
+  constructor(title, keySize, blockSize) {
+    this.title = title;
+    this.keySize = keySize;
+    this.blockSize = blockSize;
+  }
+}
+
 export class StreamCipher {
   key;
 

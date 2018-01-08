@@ -10,13 +10,14 @@
  * length: 24 bytes 192 bit
  */
 
-import { BlockCipher } from '../base/api';
+import { BlockCipher, BlockCipherMeta } from '../base/api';
 
 import { encrypt, decrypt, expandKey } from './rijndael/core';
 
 export class AES192BlockCipher extends BlockCipher {
 
-  static title = 'aes-192';
+  static meta = new BlockCipherMeta('aes-192', 24, 16);
+  static title = AES192BlockCipher.meta.title;
 
   constructor(key) {
     super(key);
