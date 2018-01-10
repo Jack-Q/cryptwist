@@ -14,7 +14,7 @@
  * cipher: 8 bytes, 64 bits
  */
 
-import { BlockCipher } from '../base/api';
+import { BlockCipher, BlockCipherMeta } from '../base/api';
 
 // primitive operators
 const mul = (a, b) => ((a & 0xffff) || 0x10000) * ((b & 0xffff) || 0x10000) % 0x10001;
@@ -108,7 +108,7 @@ const ideaCore = (msg, key) => {
 
 export class IDEABlockCipher extends BlockCipher {
 
-  static meta = new IDEABlockCipher('idea-128', 8, 8);
+  static meta = new BlockCipherMeta('idea-128', 8, 8);
   static title = IDEABlockCipher.meta.title;
 
   constructor(key) {
