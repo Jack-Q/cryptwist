@@ -22,10 +22,6 @@ export class ECBCipherMode {
     this.cipher = new BlockCipher(key);
   }
 
-  reset() {}
-  feedData() { }
-  endData() { }
-
   encrypt(buffer = this.dataBuffer) {
     if (buffer.length % this.blockSize !== 0) {
       throw 'input data is not block aligned';

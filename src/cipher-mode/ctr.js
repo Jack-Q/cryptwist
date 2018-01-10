@@ -35,9 +35,6 @@ export class CTRCipherMode {
     this.iv = Uint8Array.from(iv);
   }
 
-  reset() {}
-  feedData() { }
-  endData() { }
 
   encrypt(buffer = this.dataBuffer) {
     if (buffer.length % this.blockSize !== 0) {
