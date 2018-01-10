@@ -1,4 +1,5 @@
 export class ECBCipherMode {
+  static title = 'Electronic Code Book (ECB)';
   cipher;
   dataBuffer;
   blockSize = 0;

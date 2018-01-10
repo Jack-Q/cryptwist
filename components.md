@@ -21,12 +21,14 @@
 ## Block Cipher Mode for Operation
 
  General Reference ([NIST](http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf))
- * [ ] ECB: Electronic Code Book
- * [ ] CBC: Cipher Block Chain
+ * [x] ECB: Electronic Code Book
+ * [x] CBC: Cipher Block Chain
  * [ ] CFB: Cipher Feedback
+   - [x] Basic mode (CFB-n, where is the same as block size of underlay block cipher)
    - [ ] OpenPGP CFB: ([RFC 4880 (Section-13.9)](https://tools.ietf.org/html/rfc4880#section-13.9))
- * [ ] OFB: Output Feedback
- * [ ] CTR: Counter
+   - [ ] CFB-n mode
+ * [x] OFB: Output Feedback
+ * [x] CTR: Counter
 
 ## Hash Functions
 
@@ -52,7 +54,7 @@
    - [x] SHAKE-128 XOF
    - [x] SHAKE-256 XOF
 
-## Message Authentication Codes 
+## Message Authentication Codes
 
  * [x] HMAC (Keyed-Hashing for Message Authentication) ([RFC2104](https://tools.ietf.org/html/rfc2104))
   - [x] HMAC-MD5 ([RFC2202](https://tools.ietf.org/html/rfc2202))
@@ -66,7 +68,7 @@
 
  * [x] RC4
  * [ ] RC4-MD5
- * [ ] Linear congruential generator 
+ * [ ] Linear congruential generator
  * [ ] Hash-based
  * [ ] Cipher-based
  * [ ] ANSI-X9.17

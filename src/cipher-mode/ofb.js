@@ -1,4 +1,5 @@
 export class OFBCipherMode {
+  static title = 'Output Feedback (OFB)';
   cipher;
   dataBuffer;
   blockSize = 0;

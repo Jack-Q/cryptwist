@@ -9,7 +9,7 @@ declare namespace cryptwist {
 
       /**
        * encode message using current encoder
-       * 
+       *
        * @argument msg message to be encoded
        * @returns encoding result
        */
@@ -17,7 +17,7 @@ declare namespace cryptwist {
 
       /**
        * decode message using current encoder (decoder)
-       * 
+       *
        * @argument msg encoded message to be decoded
        * @returns decoding result
        */
@@ -45,7 +45,7 @@ declare namespace cryptwist {
 
       /**
        * compress message using current compressor
-       * 
+       *
        * @argument msg message to be compressed
        * @returns compression result
        */
@@ -53,7 +53,7 @@ declare namespace cryptwist {
 
       /**
        * decompress message using current compressor (decompressor)
-       * 
+       *
        * @argument msg compressed message to be decompressed
        * @returns decompression result
        */
@@ -81,7 +81,7 @@ declare namespace cryptwist {
       constructor(key: Uint8Array);
       /**
        * encrypt message using current cipher
-       * 
+       *
        * @argument msg message to be encrypted
        * @returns encryption result
        */
@@ -89,7 +89,7 @@ declare namespace cryptwist {
 
       /**
        * decrypt message using current cipher
-       * 
+       *
        * @argument cipher cipher text
        * @returns decrypted plain message
        */
@@ -108,6 +108,39 @@ declare namespace cryptwist {
     const getBLockCipher: (string) => (typeof BlockCipher)?;
   }
 
+  export declare namespace cipherMode {
+    abstract class CipherMode {
+      /**
+       * the name of current block cipher mode
+       */
+      static title: string;
+      /**
+       * construct block cipher mode with an underalying block cipher
+       *
+       * @param BlockCipher underlaying block cipher
+       * @param key key used in the cipher
+       * @param iv initialization vector
+       */
+      constructor(BlockCipher: typeof blockCipher.BlockCipher, key: Uint8Array, iv: Uint8Array);
+      /**
+       * encrypt message using current cipher
+       *
+       * @argument msg message to be encrypted
+       * @returns encryption result
+       */
+      encrypt: (msg: Uint8Array) => Uint8Array;
+
+      /**
+       * decrypt message using current cipher
+       *
+       * @argument cipher cipher text
+       * @returns decrypted plain message
+       */
+      decrypt: (cipher: Uint8Array) => Uint8Array;
+
+    }
+  }
+
   export declare namespace streamCipher {
     abstract class StreamCipher {
       /**
@@ -123,13 +156,13 @@ declare namespace cryptwist {
 
       /**
        * get a bit stream generated from current key
-       * 
+       *
        */
       get stream(): { next: () => ({ done: boolean, value: number }) };
 
       /**
        * encrypt message using current cipher
-       * 
+       *
        * @argument msg message to be encrypted
        * @returns encryption result
        */
@@ -137,7 +170,7 @@ declare namespace cryptwist {
 
       /**
        * decrypt message using current cipher
-       * 
+       *
        * @argument cipher cipher text
        * @returns decrypted plain message
        */
@@ -164,10 +197,10 @@ declare namespace cryptwist {
 
       /**
        * feed the last section of data
-       * 
-       * After invocation to this method, hash result is returned 
+       *
+       * After invocation to this method, hash result is returned
        * and the inner state of the hash object is reset.
-       * 
+       *
        * @param data the last segment of data (optional)
        * @returns the hash result of all message segment
        */
@@ -180,11 +213,11 @@ declare namespace cryptwist {
 
       /**
        * quick method to genrate hash usint current hash object
-       * 
-       * if current hash object is not clean (in process of generating 
-       * hash of a serial data segment), a new temporary hash object 
+       *
+       * if current hash object is not clean (in process of generating
+       * hash of a serial data segment), a new temporary hash object
        * with same initialization parameter is created.
-       * 
+       *
        * @param data full message to be used to generate hash
        * @returns the hash of data
        */
@@ -192,7 +225,7 @@ declare namespace cryptwist {
 
       /**
        * quick method to genrate hash usint current hash object
-       * 
+       *
        * @param data full message to be used to generate hash
        * @returns the hash of data
        */

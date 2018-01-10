@@ -13,6 +13,8 @@ const bufferAdd = (base, addedValue) => {
 };
 
 export class CTRCipherMode {
+  static title = 'Counter (CTR)';
+
   cipher;
   dataBuffer;
   blockSize = 0;

@@ -1,4 +1,5 @@
 export class CBCCipherMode {
+  static title = 'Cipher Block Chain (CBC)';
   cipher;
   dataBuffer;
   blockSize = 0;

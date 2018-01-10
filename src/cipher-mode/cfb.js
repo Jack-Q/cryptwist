@@ -1,4 +1,5 @@
 export class CFBCipherMode {
+  static title = 'Cipher Feedback (CFB)';
   cipher;
   dataBuffer;
   blockSize = 0;

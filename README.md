@@ -33,7 +33,8 @@ yarn add cryptwist
 
 ## Usage
 
-Please check the unit tests as reference for usage hints
+Please check the unit tests as reference for usage hints.
+[The typings information](./typings/index.d.ts) also provides a glance of the interface of this library.
 
 ## Supported components
 
