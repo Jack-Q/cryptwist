@@ -2,7 +2,6 @@ import { Hash, TODO } from '../../base/api';
 import { Int64, Int128 } from '../../util/big-int';
 
 export class MD4HashBase extends Hash {
-
   hash(data) {
     if (this.clean) {
       return this.endData(data);
@@ -43,7 +42,7 @@ export class MD4HashBase extends Hash {
     this.buffer.fill(0, this.bufferLength + 1);
 
     if (this.bufferLength >= lengthFieldOffset) {
-        // no sufficient space for writing padding length
+      // no sufficient space for writing padding length
       this.mainLoop();
       this.buffer.fill(0);
     }

@@ -15,7 +15,6 @@ import { BlockCipher, BlockCipherMeta } from '../base/api';
 import { encrypt, decrypt, expandKey } from './rijndael/core';
 
 export class AES192BlockCipher extends BlockCipher {
-
   static meta = new BlockCipherMeta('aes-192', 24, 16);
   static title = AES192BlockCipher.meta.title;
 

@@ -1,9 +1,7 @@
 import { SHA3_512Hash } from './sha3-512'; // eslint-disable-line camelcase
 import Encode from '../encode';
 
-const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
-  Encode.HexEncoder.encode(SHA3_512Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))))),
-).toEqual(md));
+const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(Encode.HexEncoder.encode(SHA3_512Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0)))))).toEqual(md));
 
 // Here cen use libdigest-sha3-perl (Debian) package which provides an global command
 // echo -n "message" | sha3sum -a 224
@@ -32,6 +30,4 @@ const testCases = [
 
 testCases.forEach(i => test(...i));
 
-it('should hash large data correctly', () => expect(
-  Encode.HexEncoder.encode(SHA3_512Hash.hash(new Uint8Array(12000))),
-).toEqual('986323b11111c52e259a411c46a8e61c29a7863bf3ae4015290f02f1ac612dd4a4335135bcf959d347b200a8a924cd0e17090c92153e12894ae7e57fb405424c'));
+it('should hash large data correctly', () => expect(Encode.HexEncoder.encode(SHA3_512Hash.hash(new Uint8Array(12000)))).toEqual('986323b11111c52e259a411c46a8e61c29a7863bf3ae4015290f02f1ac612dd4a4335135bcf959d347b200a8a924cd0e17090c92153e12894ae7e57fb405424c'));

@@ -77,7 +77,6 @@ const sha1MainLoop = (state, buffer) => {
 
 
 export class SHA1Hash extends MD4HashBase {
-
   static title = 'sha-1';
 
   constructor() {

@@ -157,10 +157,10 @@ export class Inflate {
     // use 0 by default indicating the corresponding bit is not used
     const table = Array(codeLengthDecoderDict.length).fill(0);
     for (let i = 0; i < nCode; i += 1) {
-              // retrieve the encoded length of code
+      // retrieve the encoded length of code
       table[codeLengthDecoderDict[i]] = this.getBit(3);
     }
-            // Huffman decode of the code length table
+    // Huffman decode of the code length table
     return this.getHuffmanCodeTable(table);
   }
 

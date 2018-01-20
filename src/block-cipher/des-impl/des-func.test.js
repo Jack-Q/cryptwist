@@ -11,7 +11,7 @@ it('should expand data', () => expect(toBinary(exp).replace(/ /g, ''))
 
 const expK = xor(exp, key);
 it('should apply sub-key', () => expect(toBinary(expK).replace(/ /g, ''))
-.toEqual('011000 010001 011110 111010 100001 100110 010100 100111'.replace(/ /g, '')));
+  .toEqual('011000 010001 011110 111010 100001 100110 010100 100111'.replace(/ /g, '')));
 
 const subs = sBoxSubstitute(expK);
 it('should substitute with S-Box', () => expect(toBinary(subs).replace(/ /g, ''))

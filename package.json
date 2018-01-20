@@ -21,7 +21,7 @@
     "build": "npm run clean && cross-env BABEL_ENV=production babel src -d lib --ignore spec.js,test.js,test-util.js",
     "lint": "eslint --ext .js src",
     "test": "npm run build && npm run lint && jest",
-    "coveralls": "npm run build && jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "coveralls": "npm run build && jest src --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "prepublishOnly": "npm run test && npm run build",
     "clean": "rimraf -r coverage lib"
   },

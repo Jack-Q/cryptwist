@@ -9,12 +9,10 @@ it('should generate 16 sub-keys of 48 bits', () => expect(subKey.every(i => i.le
 
 const toBinary = k => Array.from(k).map(i => (256 + i).toString(2).slice(-8)).join(' ');
 
-const core = checkKey(
-  Uint8Array.of(
-    0b00010011, 0b00110100, 0b01010111, 0b01111001,
-    0b10011011, 0b10111100, 0b11011111, 0b11110001,
-  ),
-).core;
+const core = checkKey(Uint8Array.of(
+  0b00010011, 0b00110100, 0b01010111, 0b01111001,
+  0b10011011, 0b10111100, 0b11011111, 0b11110001,
+)).core;
 const pk = permuteKey(core);
 const subKey2 = generateSubKey(core);
 // subKey2.map(k => console.log(toBinary(k)));

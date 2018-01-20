@@ -98,4 +98,6 @@ export const finalBitPermute = (data) => {
   ];
 };
 
-export default { initialPermute, finalPermute, initialBitPermute, finalBitPermute };
+export default {
+  initialPermute, finalPermute, initialBitPermute, finalBitPermute,
+};

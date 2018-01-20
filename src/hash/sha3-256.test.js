@@ -1,9 +1,7 @@
 import { SHA3_256Hash } from './sha3-256'; // eslint-disable-line camelcase
 import Encode from '../encode';
 
-const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
-  Encode.Base16Encoder.encode(SHA3_256Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))))),
-).toEqual(md.toUpperCase()));
+const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(Encode.Base16Encoder.encode(SHA3_256Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0)))))).toEqual(md.toUpperCase()));
 
 // Here cen use libdigest-sha3-perl (Debian) package which provides an global command
 // echo -n "message" | sha3sum -a 256
@@ -18,6 +16,4 @@ const testCases = [
 
 testCases.forEach(i => test(...i));
 
-it('should hash large data correctly', () => expect(
-  Encode.Base16Encoder.encode(SHA3_256Hash.hash(new Uint8Array(12000))),
-).toEqual('A225F2056DECCF04B5A14E76CF09DC54293F90E2B0958839AFC5987E8B9F8EF1'));
+it('should hash large data correctly', () => expect(Encode.Base16Encoder.encode(SHA3_256Hash.hash(new Uint8Array(12000)))).toEqual('A225F2056DECCF04B5A14E76CF09DC54293F90E2B0958839AFC5987E8B9F8EF1'));

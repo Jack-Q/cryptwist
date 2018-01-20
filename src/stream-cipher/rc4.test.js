@@ -9,7 +9,7 @@ it('should keep the result of decryption the same as input', () => expect(cipher
 it('cipher should encrypt the message to other value', () => expect(cipher.encrypt(key)).not.toEqual(key));
 
 const createStream = (size = 100, stream = cipher.stream) =>
-  Array(100).fill(0).map(() => stream.next().value);
+  Array(size).fill(0).map(() => stream.next().value);
 it('should be the same stream for the same key', () => expect(createStream()).toEqual(createStream()));
 
 it('should encrypt message as expectation', () =>

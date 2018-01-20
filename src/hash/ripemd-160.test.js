@@ -1,9 +1,7 @@
 import { RIPEMD160Hash } from './ripemd-160';
 import Encode from '../encode';
 
-const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
-  Encode.Base16Encoder.encode(RIPEMD160Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))))),
-).toEqual(md.toUpperCase()));
+const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(Encode.Base16Encoder.encode(RIPEMD160Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0)))))).toEqual(md.toUpperCase()));
 
 const testCases = [
   ['', '9c1185a5c5e9fc54612808977ee8f548b2258d31'],
@@ -17,6 +15,4 @@ const testCases = [
 
 testCases.forEach(i => test(...i));
 
-it('should hash large data correctly', () => expect(
-  Encode.Base16Encoder.encode(RIPEMD160Hash.hash(new Uint8Array(12000))),
-).toEqual('5B35DDF57520FD96BE98AAD74C383822663CC907'));
+it('should hash large data correctly', () => expect(Encode.Base16Encoder.encode(RIPEMD160Hash.hash(new Uint8Array(12000)))).toEqual('5B35DDF57520FD96BE98AAD74C383822663CC907'));

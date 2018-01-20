@@ -5,7 +5,6 @@ const iPadding = 0x36;
 const oPadding = 0x5c;
 
 export class Hmac extends Hash {
-
   static title = 'hmac';
 
   init(hashInst, blockLength, key) {

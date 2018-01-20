@@ -5,7 +5,6 @@ const KECCAK_B = 1600;
 const KECCAK_NR = 24;
 
 export class Keccak extends Sponge {
-
   constructor(HashClass, name, capacity, len, ...params) {
     super(HashClass, name, KECCAK_B, KECCAK_B - capacity, len, ...params);
 

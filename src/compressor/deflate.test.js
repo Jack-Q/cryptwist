@@ -11,11 +11,9 @@ const tests = [
 ];
 
 tests.forEach((i) => {
-  it('should inflate short chunk of messages', () => expect(
-    Array.from(DeflateCompressor.decompress(decode(i[0])))
-      .map(byte => String.fromCharCode(byte))
-      .join(''),
-  ).toEqual(i[1]));
+  it('should inflate short chunk of messages', () => expect(Array.from(DeflateCompressor.decompress(decode(i[0])))
+    .map(byte => String.fromCharCode(byte))
+    .join('')).toEqual(i[1]));
 });
 
 // following code could pipe a random generated file to decoder to test
@@ -55,5 +53,5 @@ compressTests.forEach((i) => {
   it('should compress a decompress-able package in lazy match mode', t({ algorithm: 'lazyMatch', encode: 'forceNoCompress' }));
   it('should compress a decompress-able package in lazy match mode', t({ algorithm: 'lazyMatch', encode: 'forceDynamicHuff' }));
   it('should compress a decompress-able package in lazy match mode', t({ algorithm: 'lazyMatch', encode: 'forceStaticHuff' }));
-})
-;
+});
+

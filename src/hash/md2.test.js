@@ -1,9 +1,7 @@
 import { MD2Hash } from './md2';
 import Encode from '../encode';
 
-const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
-  Encode.Base16Encoder.encode(MD2Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))))),
-).toEqual(md.toUpperCase()));
+const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(Encode.Base16Encoder.encode(MD2Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0)))))).toEqual(md.toUpperCase()));
 
 // Here cen use OpenSSL as reference implementation,
 // echo -n "message" | openssl dgst -md4
@@ -24,6 +22,4 @@ const testCases = [
 
 testCases.forEach(i => test(...i));
 
-it('should hash large data correctly', () => expect(
-  Encode.Base16Encoder.encode(MD2Hash.hash(new Uint8Array(12000))),
-).toEqual('1CD1BE2B5A50EF8C68EF3DCDA0140B5C'));
+it('should hash large data correctly', () => expect(Encode.Base16Encoder.encode(MD2Hash.hash(new Uint8Array(12000)))).toEqual('1CD1BE2B5A50EF8C68EF3DCDA0140B5C'));

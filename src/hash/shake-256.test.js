@@ -2,9 +2,7 @@ import { SHAKE256Hash } from './shake-256';
 
 import Encode from '../encode';
 
-const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
-  Encode.HexEncoder.encode(SHAKE256Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))), 1024)),
-).toEqual(md));
+const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(Encode.HexEncoder.encode(SHAKE256Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))), 1024))).toEqual(md));
 
 // Here cen use libdigest-sha3-perl (Debian) package which provides an global command
 // echo -n "message" | sha3sum -a 224
@@ -39,9 +37,5 @@ const testCases = [
 
 testCases.forEach(i => test(...i));
 
-it('should hash large data correctly', () => expect(
-  Encode.HexEncoder.encode(SHAKE256Hash.hash(new Uint8Array(12000), 1024)),
-).toEqual(
-  '7e298304af3f494263c6e709a5020b7869800c07303a3fe230fe0a6c5f4f956951ef690f88f5e29a6e02a5b95f2b0b52a81331331cb0fbd1f30e624bafe0dcdc' +
-  '8186ce0fe2c5f06f87328a4efdfe6ee9ce38c7491268af3c0847755122e8c131ce6d1bdce9aded5bb3d0956e7f330876f192808916ccf6c31a1e3d6476f49eb2',
-));
+it('should hash large data correctly', () => expect(Encode.HexEncoder.encode(SHAKE256Hash.hash(new Uint8Array(12000), 1024))).toEqual('7e298304af3f494263c6e709a5020b7869800c07303a3fe230fe0a6c5f4f956951ef690f88f5e29a6e02a5b95f2b0b52a81331331cb0fbd1f30e624bafe0dcdc' +
+  '8186ce0fe2c5f06f87328a4efdfe6ee9ce38c7491268af3c0847755122e8c131ce6d1bdce9aded5bb3d0956e7f330876f192808916ccf6c31a1e3d6476f49eb2'));

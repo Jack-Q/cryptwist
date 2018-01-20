@@ -24,8 +24,8 @@ export const checkKey = (key) => {
     }
     if (key.length === 192 || key.length === 168) {
       return key.length === 192 ?
-      [key.slice(0, 63), key.slice(64, 127), key.slice(128, 191)] :
-      [key.slice(0, 55), key.slice(56, 111), key.slice(112, 167)];
+        [key.slice(0, 63), key.slice(64, 127), key.slice(128, 191)] :
+        [key.slice(0, 55), key.slice(56, 111), key.slice(112, 167)];
     }
     throw 'the length of key for Triple-DES should be 128 or 192 (112 or 168 w/o parity bits) bits';
   }
@@ -33,7 +33,6 @@ export const checkKey = (key) => {
 };
 
 export class TripleDESBlockCipher extends BlockCipher {
-
   // the key length can be onr of 56bit, 64bit, 112bit, 128bit, 168bit, 192bit
   static meta = new BlockCipherMeta('triple-des', 128, 8);
   static title = TripleDESBlockCipher.meta.title;

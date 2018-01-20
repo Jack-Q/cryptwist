@@ -1,7 +1,6 @@
 import { Keccak } from './keccak/keccak';
 
 export class SHAKE256Hash extends Keccak {
-
   static title = 'shake-256';
 
   constructor(d) {

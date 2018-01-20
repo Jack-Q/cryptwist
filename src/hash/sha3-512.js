@@ -1,8 +1,7 @@
 import { Keccak } from './keccak/keccak';
 
- // eslint-disable-next-line camelcase
+// eslint-disable-next-line camelcase
 export class SHA3_512Hash extends Keccak {
-
   static title = 'sha3-512';
 
   constructor() {
@@ -14,5 +13,5 @@ export class SHA3_512Hash extends Keccak {
   }
 }
 
- // eslint-disable-next-line camelcase
+// eslint-disable-next-line camelcase
 export default SHA3_512Hash;

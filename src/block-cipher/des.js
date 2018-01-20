@@ -27,7 +27,6 @@ const desCore = (data, subKey) => {
 };
 
 export class DESBlockCipher extends BlockCipher {
-
   static meta = new BlockCipherMeta('des-192', 8, 8);
   static title = DESBlockCipher.meta.title;
 

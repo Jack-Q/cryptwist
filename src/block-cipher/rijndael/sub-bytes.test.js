@@ -15,5 +15,5 @@ const cases = [
 
 cases.map(c => test(...c));
 
-it('constructed S-Box should equal to predefined one', () => expect(constructSBox()).toEqual(S_BOX))
-;
+it('constructed S-Box should equal to predefined one', () => expect(constructSBox()).toEqual(S_BOX));
+

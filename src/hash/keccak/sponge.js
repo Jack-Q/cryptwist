@@ -1,7 +1,6 @@
 import { Hash, TODO } from '../../base/api';
 
 export class Sponge extends Hash {
-
   init(HashClass, name, width, rate, digestLen, ...params) {
     if (width % 32 !== 0 || rate % 32 !== 0) {
       throw 'both the width and rate of the sponge structure should be a multiple of 32';
@@ -130,7 +129,6 @@ export class Sponge extends Hash {
    * @returns {{finish: boolean}} indicate the padding process is finished over current buffer
    */
   pad(paddingResult) { TODO([this, paddingResult]); }
-
 }
 
 export default Sponge;

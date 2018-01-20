@@ -20,7 +20,6 @@ const S = [
 ];
 
 export class MD2Hash extends Hash {
-
   static title = 'md2';
 
   init() {

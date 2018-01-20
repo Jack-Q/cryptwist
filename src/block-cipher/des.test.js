@@ -4,9 +4,9 @@ import { Encoder } from '../encode';
 const { encode, decode } = Encoder.Base16Encoder;
 
 const key = Uint8Array.of(
-    0b00010011, 0b00110100, 0b01010111, 0b01111001,
-    0b10011011, 0b10111100, 0b11011111, 0b11110001,
-  );
+  0b00010011, 0b00110100, 0b01010111, 0b01111001,
+  0b10011011, 0b10111100, 0b11011111, 0b11110001,
+);
 const cipher = new DESBlockCipher(key);
 const message = '0123456789ABCDEF';
 const data = decode(message);

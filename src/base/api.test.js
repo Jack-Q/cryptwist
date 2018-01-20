@@ -20,8 +20,7 @@ const checkSubclassImplementation = (ClassName, requiredMembers) => {
   requiredMembers.map(m =>
     it(`should check implementation of ${m} in subclass`, () =>
       expect(() => (typeof inst[m] === 'function' ? inst[m]() : inst[m]))
-        .toThrow(/TODO/)),
-  );
+        .toThrow(/TODO/)));
 };
 
 

@@ -79,7 +79,6 @@ const md5MainLoop = (state, buffer) => {
 };
 
 export class MD5Hash extends MD4HashBase {
-
   static title = 'md5';
 
   constructor() {

@@ -1,5 +1,4 @@
 export class Int64 {
-
   constructor(number = 0) {
     this.data = Uint32Array.of(0, 0, 0);
     this.addNumberToLength(number);

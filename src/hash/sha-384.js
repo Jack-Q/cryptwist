@@ -14,7 +14,6 @@ const initState = Uint32Array.of(
 );
 
 export class SHA384Hash extends MD4HashBase {
-
   static title = 'sha-384';
 
   constructor() {

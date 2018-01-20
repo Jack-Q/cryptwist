@@ -1,9 +1,7 @@
 import { SHA512Hash } from './sha-512';
 import Encode from '../encode';
 
-const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(
-  Encode.Base16Encoder.encode(SHA512Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0))))),
-).toEqual(md.toUpperCase()));
+const test = (msg, md) => it(`should hash "${msg}" to "${md}"`, () => expect(Encode.Base16Encoder.encode(SHA512Hash.hash(Uint8Array.from(msg.split('').map(i => i.charCodeAt(0)))))).toEqual(md.toUpperCase()));
 
 // Here cen use OpenSSL as reference implementation,
 // echo -n "message" | openssl dgst -sha256
@@ -18,6 +16,4 @@ const testCases = [
 
 testCases.forEach(i => test(...i));
 
-it('should hash large data correctly', () => expect(
-  Encode.Base16Encoder.encode(SHA512Hash.hash(new Uint8Array(12000))),
-).toEqual('A9FC937FCC9C515F971CDBD7D201CD0290A991DBDC4FD2B9F0B69CCA93549887F7FE09B92DA1A8F1FBCDF9AE1B85AC6E5A0A7F3557EBDC24321BB9532A3D1553'));
+it('should hash large data correctly', () => expect(Encode.Base16Encoder.encode(SHA512Hash.hash(new Uint8Array(12000)))).toEqual('A9FC937FCC9C515F971CDBD7D201CD0290A991DBDC4FD2B9F0B69CCA93549887F7FE09B92DA1A8F1FBCDF9AE1B85AC6E5A0A7F3557EBDC24321BB9532A3D1553'));

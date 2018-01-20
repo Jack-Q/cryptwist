@@ -30,6 +30,14 @@ module.exports = {
     'no-bitwise': 0,
     'no-plusplus': 0,
     'no-throw-literal': 0,
+    'prefer-destructuring': [
+      'error',
+      {
+        'AssignmentExpression': {
+          'array': false,
+        }
+      }
+    ],
     'no-param-reassign': [2, {
       "props": false
     }],

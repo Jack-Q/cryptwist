@@ -96,7 +96,7 @@ export class RC4StreamCipher extends StreamCipher {
   }
 
   encrypt(data) {
-    const stream = this.stream;
+    const { stream } = this;
     return data.map(v => v ^ stream.next().value);
   }
 

@@ -22,7 +22,6 @@ export const generateIV = (t) => {
 };
 
 export class SHA512THash extends MD4HashBase {
-
   static title = 'sha-512/t';
 
   constructor(t) {

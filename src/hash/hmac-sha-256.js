@@ -4,7 +4,6 @@ import { SHA256Hash } from './sha-256';
 
 const blockLength = 64;
 export class HmacSHA256 extends Hmac {
-
   static title = 'hmac-sha256';
 
   constructor(key) {

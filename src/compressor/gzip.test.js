@@ -10,11 +10,9 @@ const tests = [
 ];
 
 tests.forEach((i) => {
-  it('should inflate short chunk of messages', expect(
-    Array.from(GzipCompressor.decompress(decode(i[0])))
-      .map(byte => String.fromCharCode(byte))
-      .join(''),
-  ).toEqual(i[1]));
+  it('should inflate short chunk of messages', expect(Array.from(GzipCompressor.decompress(decode(i[0])))
+    .map(byte => String.fromCharCode(byte))
+    .join('')).toEqual(i[1]));
 });
 
 // Tests for en-compressor
@@ -28,7 +26,8 @@ const compressTest = [
 ];
 
 
-compressTest.forEach(t => it('should compress valid zlib format message',
+compressTest.forEach(t => it(
+  'should compress valid zlib format message',
   () => expect(GzipCompressor.decompress(GzipCompressor.compress(Encode.AsciiEncoder.decode(t))))
     .toEqual(Encode.AsciiEncoder.decode(t)),
 ));

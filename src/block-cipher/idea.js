@@ -107,7 +107,6 @@ const ideaCore = (msg, key) => {
 };
 
 export class IDEABlockCipher extends BlockCipher {
-
   static meta = new BlockCipherMeta('idea-128', 8, 8);
   static title = IDEABlockCipher.meta.title;
 

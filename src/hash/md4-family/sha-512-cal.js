@@ -178,9 +178,12 @@ export const sha2MainLoop = (state, buffer) => {
         ...add(
           ...add(
             ...s1,
-            ...retrieve(internalBuffer, (j + 9) & 0xf)),
-          ...s0),
-        ...retrieve(internalBuffer, j));
+            ...retrieve(internalBuffer, (j + 9) & 0xf),
+          ),
+          ...s0,
+        ),
+        ...retrieve(internalBuffer, j),
+      );
       assign(internalBuffer, j, ...s);
     }
 
@@ -194,10 +197,14 @@ export const sha2MainLoop = (state, buffer) => {
         ...add(
           ...add(
             ...h,
-            ...sig1),
-          ...ch),
-        ...retrieve(k, i)),
-      ...retrieve(internalBuffer, j));
+            ...sig1,
+          ),
+          ...ch,
+        ),
+        ...retrieve(k, i),
+      ),
+      ...retrieve(internalBuffer, j),
+    );
 
     const sig0 = tmpSig0(...a);
 

@@ -81,8 +81,10 @@ class OutputBuffer {
 
 class MatcherHashTable {
   constructor(hashBitSize, matchLimit = Infinity) {
-    console.assert(hashBitSize <= 18 && hashBitSize > 8 && hashBitSize % 3 === 0,
-      `invalid hash table size in bit (got ${hashBitSize})`);
+    console.assert(
+      hashBitSize <= 18 && hashBitSize > 8 && hashBitSize % 3 === 0,
+      `invalid hash table size in bit (got ${hashBitSize})`,
+    );
     this.bitSize = hashBitSize;
     this.bitShiftAmount = hashBitSize / 3;
     this.bitHashKeyMask = 0xffffffff >>> (32 - hashBitSize);
@@ -366,10 +368,14 @@ const encodeCodeLength = (nodes) => {
   while (codeHuffmanCode[encodeCodeLengthDictOrder[codeSize - 1]].len > 0) codeSize--;
   const codeCost = codeSize * 3 + litLenDisDict.reduce((c, v) =>
     c + (v.length ? v[1] : codeHuffmanCode[v].len), 0);
-  return { codeSize, codeCost, codeHuffmanCode, litLenDisDict };
+  return {
+    codeSize, codeCost, codeHuffmanCode, litLenDisDict,
+  };
 };
 
-const BLOCK_TYPE = { OPTIMAL: -1, NO_COMPRESS: 0, STATIC_HUFF: 1, DYNAMIC_HUFF: 2 };
+const BLOCK_TYPE = {
+  OPTIMAL: -1, NO_COMPRESS: 0, STATIC_HUFF: 1, DYNAMIC_HUFF: 2,
+};
 class Block {
   constructor(size = 1 << 6, type = BLOCK_TYPE.OPTIMAL) {
     this.type = type;
@@ -406,16 +412,18 @@ class Block {
     const litLenSize = constHuffmanTree(litLenNodes);
     const disNodes = this.disFreq.map((i, n) => ({ lit: n, freq: i, len: 0 }));
     const disSize = constHuffmanTree(disNodes);
-    const { codeSize, codeCost, codeHuffmanCode, litLenDisDict } = encodeCodeLength([
+    const {
+      codeSize, codeCost, codeHuffmanCode, litLenDisDict,
+    } = encodeCodeLength([
       ...litLenNodes.slice(0, litLenSize),
       ...(disSize === 0 ? [{ len: 1 }] : disNodes.slice(0, disSize)),
     ]);
     const cost = Math.ceil((this.disFreq.reduce((c, f, i) =>
-        c + f * (disNodes[i].len + getDistExtraBit(i).len), 0) +
+      c + f * (disNodes[i].len + getDistExtraBit(i).len), 0) +
       this.litLenFreq.reduce((c, f, i) =>
         c + f * (litLenNodes[i].len + (isLenCode(i) ? getLenExtraBit(i).len : 0)), 0) +
       codeCost +
-      5 /* litSize */ + 5  /* distSize */ + 4 /* codeSize */
+      5 /* litSize */ + 5 /* distSize */ + 4 /* codeSize */
       + 3 /* block header */ + 7 /* incomplete byte overhead */
     ) / 8);
     this.dynamicHuffmanEncodeStatus = {
@@ -535,10 +543,12 @@ class Block {
   costBoundStaticHuff() {
     return Math.ceil((this.disFreq.reduce((cost, freq, index) =>
       cost + freq * (5 + getDistExtraBit(index).len), 0) +
-      this.litLenFreq.reduce((cost, freq, index) =>
-        cost + freq * (getStaticHuffLitLenBit(index)[1] +
+      this.litLenFreq.reduce(
+        (cost, freq, index) =>
+          cost + freq * (getStaticHuffLitLenBit(index)[1] +
           (isLenCode(index) ? getLenExtraBit(index).len : 0))
-        , 0) + 3 /* block header */ + 7 /* incomplete byte overhead */) / 8);
+        , 0,
+      ) + 3 /* block header */ + 7 /* incomplete byte overhead */) / 8);
   }
 
   /**
@@ -752,7 +762,9 @@ const messageScanRunBytes = (ctx, isEnd) => {
  * @argument {boolean} isEnd
  */
 const messageScanMatch = (ctx, isEnd) => {
-  const { in: msg, out, blockBuf: block, hashTable } = ctx;
+  const {
+    in: msg, out, blockBuf: block, hashTable,
+  } = ctx;
   const termPos = isEnd ? msg.usePos : msg.usePos - MIN_LOOK_AHEAD;
   const loopEnd = isEnd ? termPos - 2 : termPos;
 
@@ -822,7 +834,9 @@ const messageScanMatch = (ctx, isEnd) => {
  * @argument {boolean} isEnd
  */
 const messageScanLazyMatch = (ctx, isEnd) => {
-  const { in: msg, out, blockBuf: block, hashTable } = ctx;
+  const {
+    in: msg, out, blockBuf: block, hashTable,
+  } = ctx;
   const termPos = isEnd ? msg.usePos : msg.usePos - MIN_LOOK_AHEAD;
   const loopEnd = isEnd ? termPos - 2 : termPos;
 

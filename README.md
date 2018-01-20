@@ -3,6 +3,8 @@
 [![MIT License](https://img.shields.io/npm/l/cross-env.svg?style=flat-square)](./LICENSE)
 [![Build Status](https://img.shields.io/travis/Jack-Q/cryptwist.svg?style=flat-square)](https://travis-ci.org/Jack-Q/cryptwist)
 [![Coverage Status](https://img.shields.io/coveralls/github/Jack-Q/cryptwist.svg?style=flat-square)](https://coveralls.io/github/Jack-Q/cryptwist?branch=master)
+<!-- [![Dependency Status](https://img.shields.io/david/Jack-Q/cryptwist.svg?style=flat-square)](https://david-dm.org/Jack-Q/cryptwist) -->
+[![devDependencies Status](https://img.shields.io/david/dev/Jack-Q/cryptwist.svg?style=flat-square)](https://david-dm.org/Jack-Q/cryptwist?type=dev)
 
 Cryptographic Primitive Implementation for illustration
 

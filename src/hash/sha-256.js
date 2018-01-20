@@ -8,7 +8,6 @@ const initState = Uint32Array.of(
 );
 
 export class SHA256Hash extends MD4HashBase {
-
   static title = 'sha-256';
 
   constructor() {

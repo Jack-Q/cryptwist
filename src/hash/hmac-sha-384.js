@@ -4,7 +4,6 @@ import { SHA384Hash } from './sha-384';
 
 const blockLength = 128;
 export class HmacSHA384 extends Hmac {
-
   static title = 'hmac-sha384';
 
   constructor(key) {
