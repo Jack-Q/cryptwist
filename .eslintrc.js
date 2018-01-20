@@ -11,10 +11,6 @@ module.exports = {
     jest: true,
   },
   extends: 'airbnb-base',
-  // required to lint *.vue files
-  plugins: [
-    'html'
-  ],
   // check if imports actually resolve
   'settings': {
     'import/resolver': {
@@ -43,8 +39,7 @@ module.exports = {
     }],
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
-      'js': 'never',
-      'vue': 'never'
+      'js': 'never'
     }],
     // allow optionalDependencies
     'import/no-extraneous-dependencies': ['error', {

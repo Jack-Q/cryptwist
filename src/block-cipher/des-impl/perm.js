@@ -62,8 +62,8 @@ export const initialBitPermute = (data) => {
   left ^= work;
   right = (right ^ work) << 9 | (right ^ work) >>> (32 - 9);
   work = (left ^ right) & 0xaaaaaaaa;
-  left = (left ^ work) << 1 | (left ^ work) >>> (32 - 1);
-  right ^= work;
+  left ^= work;
+  right = (right ^ work) >>> 1 | (right ^ work) << (32 - 1);
 
   return [
     Uint8Array.of((left >>> 24) & 0xff, (left >>> 16) & 0xff, (left >>> 8) & 0xff, left & 0xff),
@@ -75,7 +75,8 @@ export const finalBitPermute = (data) => {
   let [left, right] = dataToInt(data);
   let work = 0;
 
-  right = right >>> 1 | right << (32 - 1);
+  left = left << 1 | left >>> (32 - 1);
+  // right = right >>> 1 | right << (32 - 1);
   work = (left ^ right) & 0xaaaaaaaa;
   right ^= work;
   left = (left ^ work) >>> 9 | (left ^ work) << (32 - 9);

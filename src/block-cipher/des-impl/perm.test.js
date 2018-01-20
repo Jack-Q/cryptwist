@@ -1,21 +1,22 @@
 import {
   initialPermute, finalPermute,
-  // initialBitPermute, finalBitPermute,
+  initialBitPermute, // finalBitPermute,
 } from './perm';
 
 const toBinary = k => Array.from(k).map(i => (256 + i).toString(2).slice(-8)).join(' ');
 const toBinSub = s => toBinary(Array.of(...s[0], ...s[1]));
 
 const data = [Uint8Array.of(0xac, 0xbc, 0xcc, 0xdc), Uint8Array.of(0x95, 0x85, 0x75, 0x65)];
+const permutedData = [Uint8Array.of(0xcc, 0x5a, 0xff, 0xf0), Uint8Array.of(0x3f, 0xc3, 0x0f, 0x00)];
 
-// it('should permute data', () => expect(initialPermute(data)).toEqual(data));
-// it('should permute data', () => expect(initialBitPermute(data)).toEqual(data));
+it('should permute data', () => expect(toBinSub(initialPermute(data))).toEqual(toBinSub(permutedData)));
+it('should permute data', () => expect(toBinSub(initialBitPermute(data))).toEqual(toBinSub(permutedData)));
 it('permutation operation is reversible', () => expect(finalPermute(initialPermute(data))).toEqual(data));
 it('permutation operation is reversible', () => expect(initialPermute(finalPermute(data))).toEqual(data));
 // it('permutation operation (bit based) is reversible', () =>
-//   expect(finalBitPermute(initialBitPermute(data))).toEqual(data));
-// it('permutation operations are equivalent', () =>
-//   expect(initialBitPermute(data)).toEqual(initialPermute(data)));
+//   expect(toBinSub(finalBitPermute(initialBitPermute(data)))).toEqual(toBinSub(data)));
+it('permutation operations are equivalent', () =>
+  expect(initialBitPermute(data)).toEqual(initialPermute(data)));
 // it('reversed permutation operations are equivalent', () =>
 //   expect(toBinSub(finalBitPermute(data))).toEqual(toBinSub(finalPermute(data))));
 
