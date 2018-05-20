@@ -75,23 +75,22 @@ export const finalBitPermute = (data) => {
   let [left, right] = dataToInt(data);
   let work = 0;
 
-  left = left << 1 | left >>> (32 - 1);
-  // right = right >>> 1 | right << (32 - 1);
-  work = (left ^ right) & 0xaaaaaaaa;
-  right ^= work;
-  left = (left ^ work) >>> 9 | (left ^ work) << (32 - 9);
-  work = (left ^ right) & 0x00ff00ff;
-  right ^= work;
-  left = (left ^ work) << 6 | (left ^ work) >>> (32 - 6);
-  work = (left ^ right) & 0x33333333;
-  right ^= work;
-  left = (left ^ work) << 18 | (left ^ work) >>> (32 - 18);
-  work = (left ^ right) & 0xffff0000;
-  right ^= work;
-  left = (left ^ work) << 20 | (left ^ work) >>> (32 - 20);
-  work = (left ^ right) & 0xf0f0f0f0;
-  right ^= work;
-  left = (left ^ work) >>> 4 | (left ^ work) << (32 - 4);
+  right = right << 1 | right >>> (32 - 1);
+  work = (right ^ left) & 0xaaaaaaaa;
+  left ^= work;
+  right = (right ^ work) >>> 9 | (right ^ work) << (32 - 9);
+  work = (right ^ left) & 0x00ff00ff;
+  left ^= work;
+  right = (right ^ work) << 6 | (right ^ work) >>> (32 - 6);
+  work = (right ^ left) & 0x33333333;
+  left ^= work;
+  right = (right ^ work) << 18 | (right ^ work) >>> (32 - 18);
+  work = (right ^ left) & 0xffff0000;
+  left ^= work;
+  right = (right ^ work) << 20 | (right ^ work) >>> (32 - 20);
+  work = (right ^ left) & 0xf0f0f0f0;
+  left ^= work;
+  right = (right ^ work) >>> 4 | (right ^ work) << (32 - 4);
 
   return [
     Uint8Array.of((left >>> 24) & 0xff, (left >>> 16) & 0xff, (left >>> 8) & 0xff, left & 0xff),
